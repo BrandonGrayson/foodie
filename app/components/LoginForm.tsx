@@ -24,6 +24,28 @@ export default function LoginForm() {
                 body: formData
             })
 
+            const accessToken = await req.json()
+
+            console.log('login response', accessToken)
+
+            return accessToken
+        } catch (error) {
+            console.log(error)
+        }
+    };
+
+    const createAccount = async () => {
+        console.log('create account')
+
+        try {
+            const req = await fetch("http://127.0.0.1:8000/users", {
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNCwiZXhwIjoxNzY3MjE4MzcwfQ.sGZC4tKCVGO2mbim-CevO0oLKuMHOmDfayiTOf0ywW0"
+                },
+                body: "hello"
+            })
+
             const res = await req.json()
 
             console.log('login response', res)
@@ -32,21 +54,16 @@ export default function LoginForm() {
         } catch (error) {
             console.log(error)
         }
-  };
-
-    const createAccount = () => {
-        console.log('create account')
     }
 
     return (
         <Grid spacing={2}>
-            <Grid size={{ xs: 12 }}>
+            <Grid size={{ xs: 12 }} sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh'}}>
                 <Stack spacing={2}>
-                    <Typography>Foodie</Typography>
+                    <Typography sx={{fontSize: '3em', width: '100%', display: 'flex', justifyContent: 'center', fontFamily: 'poppins'}}>Foodie</Typography>
                     <TextField
                         label="Email"
                         variant="outlined"
-                        fullWidth
                         sx={{ backgroundColor: "grey", marginTop: "10px" }}
                         value={email}
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,7 +73,6 @@ export default function LoginForm() {
                     <TextField
                         label="Password"
                         variant="outlined"
-                        fullWidth
                         sx={{ backgroundColor: "grey" }}
                         value={password}
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,9 +80,10 @@ export default function LoginForm() {
                         }}
                     />
 
-                    <Button onClick={handleLogin}>Log In</Button>
+                    <Button variant="contained" onClick={handleLogin}>Log In</Button>
 
                     <Stack direction="row" spacing={2}>
+                    
                         <Typography>Dont have an Account?</Typography>
 
                         <Button onClick={createAccount}>Sign Up</Button>
