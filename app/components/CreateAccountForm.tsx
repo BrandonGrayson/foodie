@@ -2,23 +2,27 @@
 import { Button, Grid, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import Link from "next/link";
+import { json } from "stream/consumers";
 
 export default function CreateAccountForm() {
     const [phoneNumber, setPhoneNumber] = useState("")
     const [fullName, setFullName] = useState("")
-    const [userName, setUserName] = useState("")
+    const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [userName, setUserName] = useState("")
 
     const createAccount = async () => {
         console.log('create account')
+
+        const userCredentials = {email: email, password: password, phone_number: phoneNumber, full_name: fullName, user_name: userName}
 
         try {
             const req = await fetch("http://127.0.0.1:8000/users", {
                 method: "POST",
                 headers: {
-                    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNCwiZXhwIjoxNzY3MjE4MzcwfQ.sGZC4tKCVGO2mbim-CevO0oLKuMHOmDfayiTOf0ywW0"
+                    "Content-Type": "application/json",
                 },
-                body: "hello"
+                body: JSON.stringify(userCredentials)
             })
 
             const res = await req.json()
@@ -55,24 +59,45 @@ export default function CreateAccountForm() {
                         label="Phone Number"
                         variant="outlined"
                         value={phoneNumber}
+                        onChange={(event) => {
+                            setPhoneNumber(event.target.value)
+                        }}
                     />
                     <TextField
                         sx={{ backgroundColor: "grey" }}
                         label="Full Name"
                         variant="outlined"
                         value={fullName}
+                        onChange={(event) => {
+                            setFullName(event.target.value)
+                        }}
                     />
                     <TextField
                         sx={{ backgroundColor: "grey" }}
-                        label="UserName"
+                        label="Email"
                         variant="outlined"
-                        value={userName}
+                        value={email}
+                        onChange={(event) => {
+                            setEmail(event.target.value)
+                        }}
                     />
                     <TextField
                         sx={{ backgroundColor: "grey" }}
                         label="Password"
                         variant="outlined"
                         value={password}
+                        onChange={(event) => {
+                            setPassword(event.target.value)
+                        }}
+                    />
+                    <TextField
+                        sx={{ backgroundColor: "grey" }}
+                        label="UserName"
+                        variant="outlined"
+                        value={userName}
+                        onChange={(event) => {
+                            setUserName(event.target.value)
+                        }}
                     />
                     <Button onClick={createAccount} variant="contained"> Sign Up</Button>
 
