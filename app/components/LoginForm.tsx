@@ -3,6 +3,7 @@ import { useState } from "react";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import { Typography, Stack, Button } from "@mui/material";
+import Link from "next/link";
 
 export default function LoginForm() {
     const [email, setEmail] = useState("");
@@ -34,27 +35,7 @@ export default function LoginForm() {
         }
     };
 
-    const createAccount = async () => {
-        console.log('create account')
 
-        try {
-            const req = await fetch("http://127.0.0.1:8000/users", {
-                method: "POST",
-                headers: {
-                    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNCwiZXhwIjoxNzY3MjE4MzcwfQ.sGZC4tKCVGO2mbim-CevO0oLKuMHOmDfayiTOf0ywW0"
-                },
-                body: "hello"
-            })
-
-            const res = await req.json()
-
-            console.log('login response', res)
-
-            return res
-        } catch (error) {
-            console.log(error)
-        }
-    }
 
     return (
         <Grid spacing={2}>
@@ -86,7 +67,7 @@ export default function LoginForm() {
                     
                         <Typography>Dont have an Account?</Typography>
 
-                        <Button onClick={createAccount}>Sign Up</Button>
+                        <Link href="/create-account">Sign Up</Link>
                     </Stack>
                 </Stack>
             </Grid>
