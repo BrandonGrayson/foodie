@@ -19,9 +19,6 @@ export default function LoginForm() {
         try {
             const req = await fetch("http://127.0.0.1:8000/login", {
                 method: "POST",
-                headers: {
-                    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNCwiZXhwIjoxNzY3MjE4MzcwfQ.sGZC4tKCVGO2mbim-CevO0oLKuMHOmDfayiTOf0ywW0"
-                },
                 body: formData
             })
 
