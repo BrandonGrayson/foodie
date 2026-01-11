@@ -2,6 +2,7 @@
 import { Button, Grid, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function CreateAccountForm() {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -12,10 +13,18 @@ export default function CreateAccountForm() {
   const [isLoading, setIsLoading] = useState(false);
 
   const isValidEmail = /\S+@\S+\.\S+/.test(email);
-  const isValidPassword = password.length >= 8;
+  // const isValidPassword = password.length >= 8;
+
+  const router = useRouter();
 
   const isDisabled =
-    !phoneNumber || !fullName || !userName || !isValidEmail || !isValidPassword || !password || !email
+    !phoneNumber ||
+    !fullName ||
+    !userName ||
+    !isValidEmail ||
+    // !isValidPassword ||
+    !password ||
+    !email;
 
   const createAccount = async () => {
     console.log("create account");
@@ -44,12 +53,16 @@ export default function CreateAccountForm() {
 
       setIsLoading(false);
 
-      return res;
+      if (res.id) {
+        router.push("/");
+      }
+
+      // return res;
     } catch (error) {
       console.log(error);
-      
     }
   };
+
   return (
     <Grid spacing={2}>
       <Grid
@@ -119,6 +132,13 @@ export default function CreateAccountForm() {
             disabled={isDisabled}
             onClick={createAccount}
             variant="contained"
+            color="primary"
+            sx={{
+              "&.Mui-disabled": {
+                backgroundColor: "inherit",
+                color: "#840f0fff",
+              },
+            }}
           >
             {" "}
             Sign Up
