@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import UserProfile from "../components/UserProfile";
 
 export default async function ProfilePage() {
-    const cookieStore = await cookies();
+  const cookieStore = await cookies();
 
   const cookieHeader = cookieStore
     .getAll()
@@ -12,10 +12,12 @@ export default async function ProfilePage() {
 
   const res = await fetch("http://localhost:8000/me", {
     headers: {
-      Cookie: cookieStore.toString(),
+      Cookie: cookieHeader,
     },
     cache: "no-store",
   });
+
+  console.log("res", res);
 
   if (!res.ok) {
     redirect("/");
@@ -23,7 +25,7 @@ export default async function ProfilePage() {
 
   const user = await res.json();
 
-  console.log('user', user)
+  console.log("user", user);
   return (
     <>
       <h1>Profile</h1>
