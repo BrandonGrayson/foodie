@@ -5,6 +5,34 @@ import UserProfile from "../components/UserProfile";
 export default async function ProfilePage() {
   const cookieStore = await cookies();
 
+  const API_KEY = process.env.PEXELS_API_KEY;
+
+  if (!API_KEY) {
+    throw new Error("PEXELS_API_KEY is not defined");
+  }
+
+  const getFavorites = async () => {
+    const req = await fetch(
+      "https://api.pexels.com/v1/search?query=Burgers&per_page=12",
+      {
+        method: "GET",
+        headers: {
+          Authorization: API_KEY
+        },
+      }
+    );
+
+    const res = await req.json();
+
+    console.log("res", res);
+
+    return res.photos;
+  };
+
+  const favorites = await getFavorites();
+
+  console.log("fav", favorites);
+
   const cookieHeader = cookieStore
     .getAll()
     .map((cookie) => `${cookie.name}=${cookie.value}`)
@@ -28,8 +56,7 @@ export default async function ProfilePage() {
   console.log("user", user);
   return (
     <>
-      <h1>Profile</h1>
-      <UserProfile />
+      <UserProfile favorites={favorites} />
     </>
   );
 }
