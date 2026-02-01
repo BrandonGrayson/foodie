@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import UserProfile from "../components/UserProfile";
+import { Button } from "@mui/material";
 
 export default async function ProfilePage() {
   const cookieStore = await cookies();
@@ -54,6 +55,7 @@ export default async function ProfilePage() {
   const user = await res.json();
 
   console.log("user", user);
+
   return (
     <>
       <UserProfile favorites={favorites} />
