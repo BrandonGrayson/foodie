@@ -9,7 +9,7 @@ import {
 import Avatar from "@mui/material/Avatar";
 import Grid from "@mui/material/Grid";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Favorites {
   id: number;
@@ -18,7 +18,22 @@ interface Favorites {
   };
 }
 
-export default function UserProfile({ favorites }: { favorites: Favorites[] }) {
+interface FoodItem {
+  key: string;
+  url: string;
+  size: number;
+  last_modified: string;
+}
+
+interface UserProfileProps {
+  favorites: Favorites[];
+  foodItems: FoodItem[];
+}
+
+export default function UserProfile({
+  favorites,
+  foodItems,
+}: UserProfileProps) {
   // default profile picture
 
   // highlights / top 10 foods
@@ -29,6 +44,11 @@ export default function UserProfile({ favorites }: { favorites: Favorites[] }) {
 
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [foodList, setFoodList] = useState<FoodItem[]>([]);
+
+  useEffect(() => {
+    setFoodList(foodItems)
+  }, [foodItems])
 
   //   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
   //     const selected = e.target.files?.[0];
@@ -58,17 +78,29 @@ export default function UserProfile({ favorites }: { favorites: Favorites[] }) {
     return res.json();
   };
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const selected = e.target.files?.[0];
     if (!selected) return;
 
     setFile(selected);
     setPreview(URL.createObjectURL(selected));
 
-    uploadImage(selected); // ✅ immediate upload
+    const uploaded = await uploadImage(selected); // ✅ immediate upload
+
+    setFoodList((prev) => [
+      {
+        key: uploaded.key,
+        url: uploaded.url,
+        size: selected.size,
+        last_modified: new Date().toISOString(),
+      },
+      ...prev,
+    ]);
   }
 
-  //
+  console.log("foodItems", foodItems);
+
+
   return (
     <Grid
       container
@@ -140,9 +172,9 @@ export default function UserProfile({ favorites }: { favorites: Favorites[] }) {
       </Grid>
       <Grid size={12}>
         <ImageList sx={{ width: "100%" }} cols={3}>
-          {favorites.map((fav) => (
+          {foodList.map((fav) => (
             <ImageListItem
-              key={fav.id}
+              key={fav.key}
               sx={{
                 position: "relative",
                 aspectRatio: "1 / 1", // 👈 square
@@ -155,7 +187,7 @@ export default function UserProfile({ favorites }: { favorites: Favorites[] }) {
                 fill
                 sizes="(max-width: 600px) 33vw, 200px"
                 style={{ objectFit: "cover" }}
-                src={fav.src.original}
+                src={fav.url}
               />
             </ImageListItem>
           ))}

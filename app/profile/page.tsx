@@ -1,7 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import UserProfile from "../components/UserProfile";
-import { Button } from "@mui/material";
 
 export default async function ProfilePage() {
   const cookieStore = await cookies();
@@ -18,7 +17,7 @@ export default async function ProfilePage() {
       {
         method: "GET",
         headers: {
-          Authorization: API_KEY
+          Authorization: API_KEY,
         },
       }
     );
@@ -56,9 +55,26 @@ export default async function ProfilePage() {
 
   console.log("user", user);
 
+  const getuserfoodieImages = async () => {
+    const res = await fetch("http://localhost:8000/listfoodieitems", {
+      headers: {
+        Cookie: cookieHeader,
+      },
+      cache: "no-store",
+    });
+
+    console.log("res", res);
+
+    const foodItems = await res.json();
+
+    return foodItems
+  };
+
+  const foodItems = await getuserfoodieImages()
+
   return (
     <>
-      <UserProfile favorites={favorites} />
+      <UserProfile favorites={favorites} foodItems={foodItems}/>
     </>
   );
 }
