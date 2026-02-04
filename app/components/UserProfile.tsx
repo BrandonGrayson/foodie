@@ -4,12 +4,15 @@ import {
   Typography,
   ImageList,
   ImageListItem,
-  Button,
+  Paper,
+  BottomNavigation,
+  BottomNavigationAction,
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Grid from "@mui/material/Grid";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
 interface Favorites {
   id: number;
@@ -42,21 +45,13 @@ export default function UserProfile({
 
   // need a list of images of places visited
 
-  const [file, setFile] = useState<File | null>(null);
+  //   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [foodList, setFoodList] = useState<FoodItem[]>([]);
 
   useEffect(() => {
-    setFoodList(foodItems)
-  }, [foodItems])
-
-  //   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-  //     const selected = e.target.files?.[0];
-  //     if (!selected) return;
-
-  //     setFile(selected);
-  //     setPreview(URL.createObjectURL(selected));
-  //   }
+    setFoodList(foodItems);
+  }, [foodItems]);
 
   const uploadImage = async (file: File) => {
     if (!file) return;
@@ -82,7 +77,7 @@ export default function UserProfile({
     const selected = e.target.files?.[0];
     if (!selected) return;
 
-    setFile(selected);
+    // setFile(selected);
     setPreview(URL.createObjectURL(selected));
 
     const uploaded = await uploadImage(selected); // ✅ immediate upload
@@ -99,7 +94,6 @@ export default function UserProfile({
   }
 
   console.log("foodItems", foodItems);
-
 
   return (
     <Grid
@@ -144,28 +138,6 @@ export default function UserProfile({
           onChange={handleChange}
         />
 
-        <label htmlFor="upload-photo">
-          <Button variant="contained" component="span">
-            Upload Photo
-          </Button>
-        </label>
-        {/* <input
-          type="file"
-          accept="image/*"
-          hidden
-          id="upload-photo"
-          onChange={handleChange}
-        />
-
-        <label htmlFor="upload-photo">
-          <Button onClick={() => {
-            if (!file) return;  
-            uploadImage(file)
-          }} variant="contained" component="span">
-            Upload Photo
-          </Button>
-        </label> */}
-
         {preview && (
           <Avatar src={preview} sx={{ width: 100, height: 100, mt: 2 }} />
         )}
@@ -192,6 +164,26 @@ export default function UserProfile({
             </ImageListItem>
           ))}
         </ImageList>
+      </Grid>
+      <Grid size={12}>
+        <Paper
+          sx={{ position: "fixed", bottom: 0, left: 0, right: 0 }}
+          elevation={3}
+        >
+          <BottomNavigation sx={{ width: "100%" }}>
+            <BottomNavigationAction
+              value="add"
+              icon={
+                <label
+                  htmlFor="upload-photo"
+                  style={{ display: "flex", cursor: "pointer" }}
+                >
+                  <AddCircleOutlineIcon fontSize="large" />
+                </label>
+              }
+            />
+          </BottomNavigation>
+        </Paper>
       </Grid>
     </Grid>
   );
