@@ -1,3 +1,5 @@
+// Notes & Issues
+// when the user uploads a photo need to be able to get and send the metadata as well
 "use client";
 import {
   Stack,
@@ -7,6 +9,13 @@ import {
   Paper,
   BottomNavigation,
   BottomNavigationAction,
+  Dialog,
+  DialogTitle,
+  DialogActions,
+  DialogContent,
+  TextField,
+  DialogContentText,
+  Button,
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Grid from "@mui/material/Grid";
@@ -45,9 +54,15 @@ export default function UserProfile({
 
   // need a list of images of places visited
 
-  //   const [file, setFile] = useState<File | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [openMetaDialog, setOpenMetaDialog] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const [foodList, setFoodList] = useState<FoodItem[]>([]);
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [location, setLocation] = useState("");
+  const [grade, setGrade] = useState("");
+  const [type, setType] = useState("");
 
   useEffect(() => {
     setFoodList(foodItems);
@@ -73,25 +88,66 @@ export default function UserProfile({
     return res.json();
   };
 
+  const uploadImageMetaData = async (key: string) => {
+    const foodieMetaData = {
+      name,
+      description,
+      location,
+      type,
+      grade,
+      image_key: key,
+    };
+
+    const res = await fetch("http://localhost:8000/foods", {
+      method: "POST",
+      credentials: "include", // 👈 important if using auth cookies
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(foodieMetaData),
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    return res.json();
+  };
+
   async function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const selected = e.target.files?.[0];
     if (!selected) return;
 
-    // setFile(selected);
+    setSelectedFile(selected);
     setPreview(URL.createObjectURL(selected));
 
-    const uploaded = await uploadImage(selected); // ✅ immediate upload
+    setOpenMetaDialog(true);
+  }
+
+  const handleClose = () => {
+    setOpenMetaDialog(false);
+  };
+
+  const handleSubmit = async () => {
+    if (!selectedFile) return;
+    const uploaded = await uploadImage(selectedFile); // ✅ immediate upload
+    const uploadFood = await uploadImageMetaData(uploaded.key);
+
+    console.log("uploadFood", uploadFood);
 
     setFoodList((prev) => [
       {
         key: uploaded.key,
         url: uploaded.url,
-        size: selected.size,
+        size: selectedFile.size,
         last_modified: new Date().toISOString(),
       },
       ...prev,
     ]);
-  }
+
+    setOpenMetaDialog(false)
+  };
 
   console.log("foodItems", foodItems);
 
@@ -184,6 +240,61 @@ export default function UserProfile({
             />
           </BottomNavigation>
         </Paper>
+        <Dialog open={openMetaDialog} onClose={handleClose}>
+          <DialogTitle>Foodie Item</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Enter some basic information to remember about this experience
+            </DialogContentText>
+          </DialogContent>
+          <form onSubmit={handleSubmit}>
+            <TextField
+              id="outlined-controlled"
+              label="Name"
+              value={name}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setName(event.target.value);
+              }}
+            />
+            <TextField
+              id="outlined-controlled"
+              label="Type"
+              value={type}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setType(event.target.value);
+              }}
+            />
+            <TextField
+              id="outlined-controlled"
+              label="Description"
+              value={description}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setDescription(event.target.value);
+              }}
+            />
+            <TextField
+              id="outlined-controlled"
+              label="Overall Grade"
+              value={grade}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setGrade(event.target.value);
+              }}
+            />
+            <TextField
+              id="outlined-controlled"
+              label="Location"
+              value={location}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setLocation(event.target.value);
+              }}
+            />
+
+            <DialogActions>
+              <Button type="submit">Submit</Button>
+              <Button>Cancel</Button>
+            </DialogActions>
+          </form>
+        </Dialog>
       </Grid>
     </Grid>
   );
