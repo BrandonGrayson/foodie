@@ -1,5 +1,5 @@
 // Notes & Issues
-// when the user uploads a photo need to be able to get and send the metadata as well
+// format dialog
 "use client";
 import {
   Stack,
@@ -31,21 +31,23 @@ interface Favorites {
 }
 
 interface FoodItem {
-  key: string;
-  url: string;
-  size: number;
-  last_modified: string;
+    description: string;
+    grade: number;
+    id: number;
+    image_key: string;
+    url: string;
+    location: string;
+    name: string;
+    type: string;
+    user_id: number;
+    created_at: string;
 }
 
 interface UserProfileProps {
-  favorites: Favorites[];
   foodItems: FoodItem[];
 }
 
-export default function UserProfile({
-  favorites,
-  foodItems,
-}: UserProfileProps) {
+export default function UserProfile({ foodItems }: UserProfileProps) {
   // default profile picture
 
   // highlights / top 10 foods
@@ -61,7 +63,7 @@ export default function UserProfile({
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
-  const [grade, setGrade] = useState("");
+  const [grade, setGrade] = useState(0);
   const [type, setType] = useState("");
 
   useEffect(() => {
@@ -129,24 +131,18 @@ export default function UserProfile({
     setOpenMetaDialog(false);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
     if (!selectedFile) return;
     const uploaded = await uploadImage(selectedFile); // ✅ immediate upload
     const uploadFood = await uploadImageMetaData(uploaded.key);
 
     console.log("uploadFood", uploadFood);
 
-    setFoodList((prev) => [
-      {
-        key: uploaded.key,
-        url: uploaded.url,
-        size: selectedFile.size,
-        last_modified: new Date().toISOString(),
-      },
-      ...prev,
-    ]);
+    setFoodList((prev) => [uploadFood, ...prev])
 
-    setOpenMetaDialog(false)
+    setOpenMetaDialog(false);
   };
 
   console.log("foodItems", foodItems);
@@ -202,7 +198,7 @@ export default function UserProfile({
         <ImageList sx={{ width: "100%" }} cols={3}>
           {foodList.map((fav) => (
             <ImageListItem
-              key={fav.key}
+              key={fav.image_key}
               sx={{
                 position: "relative",
                 aspectRatio: "1 / 1", // 👈 square
@@ -277,7 +273,7 @@ export default function UserProfile({
               label="Overall Grade"
               value={grade}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                setGrade(event.target.value);
+                setGrade(parseInt(event.target.value));
               }}
             />
             <TextField
@@ -288,7 +284,6 @@ export default function UserProfile({
                 setLocation(event.target.value);
               }}
             />
-
             <DialogActions>
               <Button type="submit">Submit</Button>
               <Button>Cancel</Button>

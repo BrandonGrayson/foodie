@@ -74,7 +74,7 @@ export default async function ProfilePage() {
 
   return (
     <>
-      <UserProfile favorites={favorites} foodItems={foodItems}/>
+      <UserProfile foodItems={foodItems}/>
     </>
   );
 }
