@@ -1,5 +1,3 @@
-// Notes & Issues
-// format dialog
 "use client";
 import {
   Stack,
@@ -43,11 +41,20 @@ interface FoodItem {
     created_at: string;
 }
 
-interface UserProfileProps {
-  foodItems: FoodItem[];
+interface User {
+    created_at: string;
+    email: string;
+    id: number;
+    user_name: string;
+    full_name: string;
 }
 
-export default function UserProfile({ foodItems }: UserProfileProps) {
+interface UserProfileProps {
+  foodItems: FoodItem[];
+  user: User
+}
+
+export default function UserProfile({ foodItems, user }: UserProfileProps) {
   // default profile picture
 
   // highlights / top 10 foods
@@ -164,8 +171,8 @@ export default function UserProfile({ foodItems }: UserProfileProps) {
         sx={{ marginTop: "25px", border: "3px solid red", maxWidth: "100%" }}
         id="homepage"
       >
-        <Typography>UserName</Typography>
-        <Typography>Steve Ross</Typography>
+        <Typography>{user.user_name}</Typography>
+        <Typography>{user.full_name}</Typography>
         <Stack direction="row" spacing={1}>
           <Stack>
             <Typography>14</Typography>
