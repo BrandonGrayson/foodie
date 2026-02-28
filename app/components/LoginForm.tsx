@@ -29,6 +29,8 @@ export default function LoginForm() {
         return;
       }
 
+      // console.log('login response', )
+
       router.push("/profile");
     } catch (error) {
       console.log(error);
