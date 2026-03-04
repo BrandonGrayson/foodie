@@ -2,11 +2,6 @@
 import {
   Stack,
   Typography,
-  ImageList,
-  ImageListItem,
-  Paper,
-  BottomNavigation,
-  BottomNavigationAction,
   Dialog,
   DialogTitle,
   DialogActions,
@@ -87,7 +82,7 @@ export default function ProfileHeader({
     const formData = new FormData();
     formData.append("file", file); // 👈 must match parameter name in FastAPI
 
-    const res = await fetch("http://localhost:8000/uploadfood", {
+    const res = await fetch("http://localhost:8000/food/upload", {
       method: "POST",
       credentials: "include", // 👈 important if using auth cookies
       body: formData,
@@ -204,13 +199,13 @@ export default function ProfileHeader({
               sx={{ height: "4em", display: "flex", cursor: "pointer" }}
             />
           </Link>
-          <Link href="/favorites">
+          <Link href="/profile/favorites">
             <FavoriteIcon sx={{ height: "4em", cursor: "pointer" }} />
           </Link>
-          <Link href="/recipes">
+          <Link href="/profile/recipes">
             <BookmarkIcon sx={{ height: "4em", cursor: "pointer" }} />
           </Link>
-          <Link href="tagged">
+          <Link href="/profile/tagged">
             <BookmarkAddIcon sx={{ height: "4em", cursor: "pointer" }} />
           </Link>
         </Stack>
