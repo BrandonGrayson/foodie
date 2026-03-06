@@ -5,18 +5,59 @@ import {
   Paper,
   BottomNavigation,
   BottomNavigationAction,
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  DialogActions,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Image from "next/image";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { useUI } from "../providers/providers";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
+import { useState } from "react";
+import ProfileFoodDialog from "./ProfileFoodDialog";
+
+interface FoodItem {
+  description: string;
+  grade: number;
+  id: number;
+  image_key: string;
+  url: string;
+  location: string;
+  name: string;
+  type: string;
+  user_id: number;
+  created_at: string;
+}
 
 export default function UserFoodList() {
-  // const {foodList, setFoodList} = useUI();
-  const { foodList } = useUI();
+  const [open, setOpen] = useState(false);
+  const [foodItem, setFoodItem] = useState<FoodItem | undefined>()
 
-  console.log('foodItems, FoodList', foodList)
-  
+  const { foodList } = useUI();
+  // const theme = useTheme();
+  // const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
+
+  // const handleClickOpen = () => {
+  //   setOpen(true);
+  // };
+
+  // const handleClose = () => {
+  //   setOpen(false);
+  // };
+
+  const handleImageSelection = (foodItem: FoodItem) => {
+
+    setFoodItem(foodItem)
+    
+    setOpen(true)
+  };
+
+  console.log("foodItems, FoodList", foodList);
+
   return (
     <Grid
       container
@@ -24,22 +65,25 @@ export default function UserFoodList() {
     >
       <Grid size={12}>
         <ImageList sx={{ width: "100%" }} cols={3}>
-          {foodList.map((fav) => (
+          {foodList.map((foodItem) => (
             <ImageListItem
-              key={fav.image_key}
+              key={foodItem.image_key}
               sx={{
                 position: "relative",
                 aspectRatio: "1 / 1", // 👈 square
                 overflow: "hidden",
-                borderRadius: 1,          
+                borderRadius: 1,
+                display: "flex",
+                cursor: "pointer",
               }}
+              onClick={() => handleImageSelection(foodItem)}
             >
               <Image
                 alt="user favorites"
                 fill
                 sizes="(max-width: 600px) 33vw, 200px"
                 style={{ objectFit: "cover" }}
-                src={fav.url}
+                src={foodItem.url}
               />
             </ImageListItem>
           ))}
@@ -65,6 +109,11 @@ export default function UserFoodList() {
           </BottomNavigation>
         </Paper>
       </Grid>
+      {
+        foodItem && (
+          <ProfileFoodDialog open={open} setOpen={setOpen} foodItem={foodItem} />
+        )
+      }
     </Grid>
   );
 }

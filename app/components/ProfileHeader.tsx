@@ -17,6 +17,8 @@ import AppsIcon from "@mui/icons-material/Apps";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import BookmarkAddIcon from "@mui/icons-material/BookmarkAdd";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+import ReorderIcon from '@mui/icons-material/Reorder';
 import Link from "next/link";
 import { useUI } from "../providers/providers";
 
