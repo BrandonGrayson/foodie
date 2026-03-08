@@ -36,6 +36,7 @@ interface FoodItem {
 export default function UserFoodList() {
   const [open, setOpen] = useState(false);
   const [foodItem, setFoodItem] = useState<FoodItem | undefined>()
+  const [currentIndex, setCurrentIndex] = useState(0)
 
   const { foodList } = useUI();
   // const theme = useTheme();
@@ -49,12 +50,11 @@ export default function UserFoodList() {
   //   setOpen(false);
   // };
 
-  const handleImageSelection = (foodItem: FoodItem) => {
-
-    setFoodItem(foodItem)
-    
-    setOpen(true)
-  };
+const handleImageSelection = (index: number) => {
+  console.log('Clicked Food Item',foodItem)
+  setCurrentIndex(index)
+  setOpen(true)
+}
 
   console.log("foodItems, FoodList", foodList);
 
@@ -65,9 +65,9 @@ export default function UserFoodList() {
     >
       <Grid size={12}>
         <ImageList sx={{ width: "100%" }} cols={3}>
-          {foodList.map((foodItem) => (
+          {foodList.map((food, index) => (
             <ImageListItem
-              key={foodItem.image_key}
+              key={food.image_key}
               sx={{
                 position: "relative",
                 aspectRatio: "1 / 1", // 👈 square
@@ -76,14 +76,14 @@ export default function UserFoodList() {
                 display: "flex",
                 cursor: "pointer",
               }}
-              onClick={() => handleImageSelection(foodItem)}
+              onClick={() => handleImageSelection(index)}
             >
               <Image
                 alt="user favorites"
                 fill
                 sizes="(max-width: 600px) 33vw, 200px"
                 style={{ objectFit: "cover" }}
-                src={foodItem.url}
+                src={food.url}
               />
             </ImageListItem>
           ))}
@@ -110,8 +110,8 @@ export default function UserFoodList() {
         </Paper>
       </Grid>
       {
-        foodItem && (
-          <ProfileFoodDialog open={open} setOpen={setOpen} foodItem={foodItem} />
+        foodList && (
+          <ProfileFoodDialog open={open} setOpen={setOpen} foodList={foodList} currentIndex={currentIndex} setCurrentIndex={setCurrentIndex} />
         )
       }
     </Grid>

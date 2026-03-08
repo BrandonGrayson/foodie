@@ -17,6 +17,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import CloseIcon from "@mui/icons-material/Close";
 import Image from "next/image";
+import { useSwipeable } from "react-swipeable";
 
 interface FoodItem {
   description: string;
@@ -32,29 +33,45 @@ interface FoodItem {
 }
 
 interface ProfileDialogProps {
-  foodItem: FoodItem;
+  foodList: FoodItem[];
+  currentIndex: number;
+  setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function ProfileFoodDialog({
-  foodItem,
+  foodList,
+  currentIndex,
+  setCurrentIndex,
   open,
   setOpen,
 }: ProfileDialogProps) {
   //   const [open, setOpen] = useState(false);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
+  const foodItem = foodList[currentIndex];
 
-  //   const handleClickOpen = () => {
-  //     setOpen(true);
-  //   };
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % foodList.length);
+  };
+
+  const handlePrev = () => {
+    setCurrentIndex((prev) => (prev === 0 ? foodList.length - 1 : prev - 1));
+  };
 
   console.log("foodItem in profile dialog", foodItem);
 
   const handleClose = () => {
     setOpen(false);
   };
+
+  const handlers = useSwipeable({
+    onSwipedLeft: handleNext,
+    onSwipedRight: handlePrev,
+    trackMouse: true,
+  });
+
   return (
     <Dialog fullScreen={fullScreen} open={open} onClose={handleClose}>
       <DialogTitle id="food-title">{foodItem.name}</DialogTitle>
@@ -72,16 +89,18 @@ export default function ProfileFoodDialog({
       </IconButton>
       <DialogContent sx={{ p: 0 }}>
         <Box
+          {...handlers}
           sx={{
             position: "relative",
             width: "100%",
-            height: { xs: 250, sm: 350, md: 450 }, // REQUIRED when using fill
+            height: { xs: 300, sm: 400, md: 500 },
           }}
         >
           <Image
             alt="user favorites"
             width={1200}
             height={800}
+            priority={true}
             style={{
               width: "100%",
               height: "100%",
@@ -90,6 +109,42 @@ export default function ProfileFoodDialog({
             sizes="(max-width: 600px) 100vw, (max-width: 1200px) 80vw, 800px"
             src={foodItem.url}
           />
+
+          {/* Left Arrow */}
+          <IconButton
+            onClick={handlePrev}
+            sx={{
+              position: "absolute",
+              left: 12,
+              top: "50%",
+              transform: "translateY(-50%)",
+              backgroundColor: "rgba(0,0,0,0.4)",
+              color: "white",
+              "&:hover": {
+                backgroundColor: "rgba(0,0,0,0.6)",
+              },
+            }}
+          >
+            ←
+          </IconButton>
+
+          {/* Right Arrow */}
+          <IconButton
+            onClick={handleNext}
+            sx={{
+              position: "absolute",
+              right: 12,
+              top: "50%",
+              transform: "translateY(-50%)",
+              backgroundColor: "rgba(0,0,0,0.4)",
+              color: "white",
+              "&:hover": {
+                backgroundColor: "rgba(0,0,0,0.6)",
+              },
+            }}
+          >
+            →
+          </IconButton>
         </Box>
         <Box sx={{ p: 2 }}>
           <DialogContentText>{foodItem.description}</DialogContentText>
