@@ -74,8 +74,23 @@ export default function ProfileFoodDialog({
   });
 
   return (
-    <Dialog fullScreen={fullScreen} open={open} onClose={handleClose}>
-      <DialogTitle id="food-title">{foodItem.name}</DialogTitle>
+    <Dialog
+      fullScreen={fullScreen}
+      fullWidth
+      maxWidth="md"
+      open={open}
+      onClose={handleClose}
+    >
+      <DialogTitle
+        id="food-title"
+        sx={{
+          maxWidth: 800,
+          mx: "auto",
+          width: "100%",
+        }}
+      >
+        {foodItem.name}
+      </DialogTitle>
       <IconButton
         aria-label="close"
         onClick={handleClose}
@@ -94,7 +109,9 @@ export default function ProfileFoodDialog({
           sx={{
             position: "relative",
             width: "100%",
-            height: { xs: 300, sm: 400, md: 500 },
+            maxWidth: 800,
+            margin: "0 auto",
+            aspectRatio: "4 / 3",
           }}
         >
           <Image
@@ -164,14 +181,6 @@ export default function ProfileFoodDialog({
           </IconButton>
         </Box>
       </DialogContent>
-      {/* <DialogActions sx={{ p: 2 }}>
-        <IconButton aria-label="like">
-          <FavoriteIcon />
-        </IconButton>
-        <IconButton aria-label="favorite">
-          <BookmarkIcon />
-        </IconButton>
-      </DialogActions> */}
     </Dialog>
   );
 }

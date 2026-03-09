@@ -70,6 +70,11 @@ export default function UserFoodList() {
             <ImageListItem
               key={food.image_key}
               onClick={() => handleImageSelection(index)}
+              sx={{
+                position: "relative",
+                aspectRatio: "1 / 1",
+                overflow: "hidden",
+              }}
             >
               <ButtonBase
                 sx={{
