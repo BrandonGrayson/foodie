@@ -50,6 +50,7 @@ export default function ProfileFoodDialog({
   //   const [open, setOpen] = useState(false);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const foodItem = foodList[currentIndex];
 
   const handleNext = () => {
@@ -110,41 +111,46 @@ export default function ProfileFoodDialog({
             src={foodItem.url}
           />
 
+          {!isMobile && (
+            <IconButton
+              onClick={handlePrev}
+              sx={{
+                position: "absolute",
+                left: 12,
+                top: "50%",
+                transform: "translateY(-50%)",
+                backgroundColor: "rgba(0,0,0,0.4)",
+                color: "white",
+                "&:hover": {
+                  backgroundColor: "rgba(0,0,0,0.6)",
+                },
+              }}
+            >
+              ←
+            </IconButton>
+          )}
+
           {/* Left Arrow */}
-          <IconButton
-            onClick={handlePrev}
-            sx={{
-              position: "absolute",
-              left: 12,
-              top: "50%",
-              transform: "translateY(-50%)",
-              backgroundColor: "rgba(0,0,0,0.4)",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "rgba(0,0,0,0.6)",
-              },
-            }}
-          >
-            ←
-          </IconButton>
 
           {/* Right Arrow */}
-          <IconButton
-            onClick={handleNext}
-            sx={{
-              position: "absolute",
-              right: 12,
-              top: "50%",
-              transform: "translateY(-50%)",
-              backgroundColor: "rgba(0,0,0,0.4)",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "rgba(0,0,0,0.6)",
-              },
-            }}
-          >
-            →
-          </IconButton>
+          {!isMobile && (
+            <IconButton
+              onClick={handleNext}
+              sx={{
+                position: "absolute",
+                right: 12,
+                top: "50%",
+                transform: "translateY(-50%)",
+                backgroundColor: "rgba(0,0,0,0.4)",
+                color: "white",
+                "&:hover": {
+                  backgroundColor: "rgba(0,0,0,0.6)",
+                },
+              }}
+            >
+              →
+            </IconButton>
+          )}
         </Box>
         <Box sx={{ p: 2 }}>
           <DialogContentText>{foodItem.description}</DialogContentText>

@@ -10,6 +10,7 @@ import {
   DialogContentText,
   DialogTitle,
   DialogActions,
+  ButtonBase,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Image from "next/image";
@@ -35,8 +36,8 @@ interface FoodItem {
 
 export default function UserFoodList() {
   const [open, setOpen] = useState(false);
-  const [foodItem, setFoodItem] = useState<FoodItem | undefined>()
-  const [currentIndex, setCurrentIndex] = useState(0)
+  const [foodItem, setFoodItem] = useState<FoodItem | undefined>();
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const { foodList } = useUI();
   // const theme = useTheme();
@@ -50,11 +51,11 @@ export default function UserFoodList() {
   //   setOpen(false);
   // };
 
-const handleImageSelection = (index: number) => {
-  console.log('Clicked Food Item',foodItem)
-  setCurrentIndex(index)
-  setOpen(true)
-}
+  const handleImageSelection = (index: number) => {
+    console.log("Clicked Food Item", foodItem);
+    setCurrentIndex(index);
+    setOpen(true);
+  };
 
   console.log("foodItems, FoodList", foodList);
 
@@ -68,23 +69,26 @@ const handleImageSelection = (index: number) => {
           {foodList.map((food, index) => (
             <ImageListItem
               key={food.image_key}
-              sx={{
-                position: "relative",
-                aspectRatio: "1 / 1", // 👈 square
-                overflow: "hidden",
-                borderRadius: 1,
-                display: "flex",
-                cursor: "pointer",
-              }}
               onClick={() => handleImageSelection(index)}
             >
-              <Image
-                alt="user favorites"
-                fill
-                sizes="(max-width: 600px) 33vw, 200px"
-                style={{ objectFit: "cover" }}
-                src={food.url}
-              />
+              <ButtonBase
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  position: "relative",
+                  aspectRatio: "1 / 1",
+                  overflow: "hidden",
+                  borderRadius: 1,
+                }}
+              >
+                <Image
+                  alt="user favorites"
+                  fill
+                  sizes="(max-width: 600px) 33vw, 200px"
+                  style={{ objectFit: "cover" }}
+                  src={food.url}
+                />
+              </ButtonBase>
             </ImageListItem>
           ))}
         </ImageList>
@@ -109,11 +113,15 @@ const handleImageSelection = (index: number) => {
           </BottomNavigation>
         </Paper>
       </Grid>
-      {
-        foodList && (
-          <ProfileFoodDialog open={open} setOpen={setOpen} foodList={foodList} currentIndex={currentIndex} setCurrentIndex={setCurrentIndex} />
-        )
-      }
+      {foodList && (
+        <ProfileFoodDialog
+          open={open}
+          setOpen={setOpen}
+          foodList={foodList}
+          currentIndex={currentIndex}
+          setCurrentIndex={setCurrentIndex}
+        />
+      )}
     </Grid>
   );
 }
