@@ -120,7 +120,7 @@ export default function ProfileFoodDialog({
     });
   };
 
-  if (!foodList.length) return null;
+  if (!foodList.length || currentIndex >= foodList.length) return null;
   const foodItem = foodList[currentIndex];
   const isLiked = likedIds.has(foodItem.id);
 
