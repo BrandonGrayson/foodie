@@ -5,6 +5,7 @@ import {
   DialogContentText,
   DialogTitle,
   Box,
+  Alert,
 } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
@@ -60,7 +61,7 @@ export default function ProfileFoodDialog({
   useEffect(() => {
     const loadLikes = async () => {
       try {
-        setError(null)
+        setError(null);
         const res = await fetch("http://localhost:8000/foods/likes", {
           credentials: "include",
         });
@@ -97,38 +98,50 @@ export default function ProfileFoodDialog({
   });
 
   const handleUserLike = async () => {
-    const likeReq = await fetch(
-      `http://localhost:8000/foods/${foodItem.id}/like`,
-      {
-        method: "POST",
-        credentials: "include", // 👈 important if using auth cookies
-        headers: {
-          "Content-Type": "application/json",
+    try {
+      const likeReq = await fetch(
+        `http://localhost:8000/foods/${foodItem.id}/like`,
+        {
+          method: "POST",
+          credentials: "include", // 👈 important if using auth cookies
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-      },
-    );
+      );
 
-    if (!likeReq.ok) {
-      console.error("Failed to toggle like");
-      return;
-    }
-
-    setLikedIds((prev) => {
-      const updated = new Set(prev);
-
-      if (updated.has(foodItem.id)) {
-        updated.delete(foodItem.id);
-      } else {
-        updated.add(foodItem.id);
+      if (!likeReq.ok) {
+        console.error("Failed to toggle like");
+        return;
       }
 
-      return updated;
-    });
+      setLikedIds((prev) => {
+        const updated = new Set(prev);
+
+        if (updated.has(foodItem.id)) {
+          updated.delete(foodItem.id);
+        } else {
+          updated.add(foodItem.id);
+        }
+
+        return updated;
+      });
+    } catch (errorReason) {
+      setError(errorReason as Error);
+    }
   };
 
   if (!foodList.length || currentIndex >= foodList.length) return null;
   const foodItem = foodList[currentIndex];
   const isLiked = likedIds.has(foodItem.id);
+
+  if (error) {
+    return (
+      <Box sx={{ p: 2 }}>
+        <Alert severity="error">{error.message}</Alert>
+      </Box>
+    );
+  }
 
   return (
     <Dialog
