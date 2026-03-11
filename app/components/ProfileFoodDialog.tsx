@@ -55,18 +55,24 @@ export default function ProfileFoodDialog({
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [likedIds, setLikedIds] = useState<Set<number>>(new Set());
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     const loadLikes = async () => {
-      const res = await fetch("http://localhost:8000/foods/likes", {
-        credentials: "include",
-      });
+      try {
+        setError(null)
+        const res = await fetch("http://localhost:8000/foods/likes", {
+          credentials: "include",
+        });
 
-      if (!res.ok) throw new Error("Failed to fetch likes");
+        if (!res.ok) throw new Error("Failed to fetch likes");
 
-      const data = await res.json();
+        const data = await res.json();
 
-      setLikedIds(new Set(data.map((item: Likes) => item.food_id)));
+        setLikedIds(new Set(data.map((item: Likes) => item.food_id)));
+      } catch (errorReason) {
+        setError(errorReason as Error);
+      }
     };
 
     loadLikes();
@@ -225,7 +231,13 @@ export default function ProfileFoodDialog({
         </Box>
         <Box>
           <IconButton aria-label="likes" onClick={handleUserLike}>
-            <FavoriteIcon color={isLiked ? "error" : "inherit"} sx={{ transition: "transform 0.15s", "&:active": { transform: "scale(1.2)" } }} />
+            <FavoriteIcon
+              color={isLiked ? "error" : "inherit"}
+              sx={{
+                transition: "transform 0.15s",
+                "&:active": { transform: "scale(1.2)" },
+              }}
+            />
           </IconButton>
           <IconButton aria-label="comments">
             <ModeCommentIcon />
