@@ -17,8 +17,6 @@ import AppsIcon from "@mui/icons-material/Apps";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import BookmarkAddIcon from "@mui/icons-material/BookmarkAdd";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
-import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
-import ReorderIcon from '@mui/icons-material/Reorder';
 import Link from "next/link";
 import { useUI } from "../providers/providers";
 
@@ -28,19 +26,6 @@ interface User {
   id: number;
   user_name: string;
   full_name: string;
-}
-
-interface FoodItem {
-  description: string;
-  grade: number;
-  id: number;
-  image_key: string;
-  url: string;
-  location: string;
-  name: string;
-  type: string;
-  user_id: number;
-  created_at: string;
 }
 
 interface Following {

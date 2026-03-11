@@ -5,54 +5,22 @@ import {
   Paper,
   BottomNavigation,
   BottomNavigationAction,
-  Dialog,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  DialogActions,
   ButtonBase,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Image from "next/image";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { useUI } from "../providers/providers";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { useTheme } from "@mui/material/styles";
 import { useState } from "react";
 import ProfileFoodDialog from "./ProfileFoodDialog";
 
-interface FoodItem {
-  description: string;
-  grade: number;
-  id: number;
-  image_key: string;
-  url: string;
-  location: string;
-  name: string;
-  type: string;
-  user_id: number;
-  created_at: string;
-}
-
 export default function UserFoodList() {
   const [open, setOpen] = useState(false);
-  const [foodItem, setFoodItem] = useState<FoodItem | undefined>();
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const { foodList } = useUI();
-  // const theme = useTheme();
-  // const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
-
-  // const handleClickOpen = () => {
-  //   setOpen(true);
-  // };
-
-  // const handleClose = () => {
-  //   setOpen(false);
-  // };
 
   const handleImageSelection = (index: number) => {
-    console.log("Clicked Food Item", foodItem);
     setCurrentIndex(index);
     setOpen(true);
   };

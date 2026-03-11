@@ -4,20 +4,19 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  DialogActions,
   Box,
 } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
-import { useState } from "react";
-import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import CloseIcon from "@mui/icons-material/Close";
 import Image from "next/image";
 import { useSwipeable } from "react-swipeable";
+import ModeCommentIcon from "@mui/icons-material/ModeComment";
+import { useState } from "react";
+import { useEffect } from "react";
 
 interface FoodItem {
   description: string;
@@ -40,6 +39,10 @@ interface ProfileDialogProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+interface Likes {
+  food_id: number;
+}
+
 export default function ProfileFoodDialog({
   foodList,
   currentIndex,
@@ -51,7 +54,23 @@ export default function ProfileFoodDialog({
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const foodItem = foodList[currentIndex];
+  const [likedIds, setLikedIds] = useState<Set<number>>(new Set());
+
+  useEffect(() => {
+    const loadLikes = async () => {
+      const res = await fetch("http://localhost:8000/foods/likes", {
+        credentials: "include",
+      });
+
+      if (!res.ok) throw new Error("Failed to fetch likes");
+
+      const data = await res.json();
+
+      setLikedIds(new Set(data.map((item: Likes) => item.food_id)));
+    };
+
+    loadLikes();
+  }, []);
 
   const handleNext = () => {
     setCurrentIndex((prev) => (prev + 1) % foodList.length);
@@ -60,8 +79,6 @@ export default function ProfileFoodDialog({
   const handlePrev = () => {
     setCurrentIndex((prev) => (prev === 0 ? foodList.length - 1 : prev - 1));
   };
-
-  console.log("foodItem in profile dialog", foodItem);
 
   const handleClose = () => {
     setOpen(false);
@@ -72,6 +89,40 @@ export default function ProfileFoodDialog({
     onSwipedRight: handlePrev,
     trackMouse: true,
   });
+
+  const handleUserLike = async () => {
+    const likeReq = await fetch(
+      `http://localhost:8000/foods/${foodItem.id}/like`,
+      {
+        method: "POST",
+        credentials: "include", // 👈 important if using auth cookies
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    if (!likeReq.ok) {
+      console.error("Failed to toggle like");
+      return;
+    }
+
+    setLikedIds((prev) => {
+      const updated = new Set(prev);
+
+      if (updated.has(foodItem.id)) {
+        updated.delete(foodItem.id);
+      } else {
+        updated.add(foodItem.id);
+      }
+
+      return updated;
+    });
+  };
+
+  if (!foodList.length) return null;
+  const foodItem = foodList[currentIndex];
+  const isLiked = likedIds.has(foodItem.id);
 
   return (
     <Dialog
@@ -173,10 +224,13 @@ export default function ProfileFoodDialog({
           <DialogContentText>{foodItem.description}</DialogContentText>
         </Box>
         <Box>
-          <IconButton aria-label="like">
-            <FavoriteIcon />
+          <IconButton aria-label="likes" onClick={handleUserLike}>
+            <FavoriteIcon color={isLiked ? "error" : "inherit"} sx={{ transition: "transform 0.15s", "&:active": { transform: "scale(1.2)" } }} />
           </IconButton>
-          <IconButton aria-label="favorite">
+          <IconButton aria-label="comments">
+            <ModeCommentIcon />
+          </IconButton>
+          <IconButton aria-label="favorites">
             <BookmarkIcon />
           </IconButton>
         </Box>
