@@ -9,6 +9,8 @@ import {
   TextField,
   DialogContentText,
   Button,
+  Box,
+  Alert,
 } from "@mui/material";
 import { useState } from "react";
 import Grid from "@mui/material/Grid";
@@ -58,6 +60,7 @@ export default function ProfileHeader({
   const [grade, setGrade] = useState(0);
   const [type, setType] = useState("");
   const { foodList, setFoodList } = useUI();
+  const [error, setError] = useState<Error | null>(null);
 
   const handleClose = () => {
     setOpenMetaDialog(false);
@@ -69,18 +72,22 @@ export default function ProfileHeader({
     const formData = new FormData();
     formData.append("file", file); // 👈 must match parameter name in FastAPI
 
-    const res = await fetch("http://localhost:8000/food/upload", {
-      method: "POST",
-      credentials: "include", // 👈 important if using auth cookies
-      body: formData,
-    });
+    try {
+      const res = await fetch("http://localhost:8000/food/upload", {
+        method: "POST",
+        credentials: "include", // 👈 important if using auth cookies
+        body: formData,
+      });
 
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(err);
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err);
+      }
+
+      return res.json();
+    } catch (errorResponse) {
+      setError(errorResponse as Error);
     }
-
-    return res.json();
   };
 
   const uploadImageMetaData = async (key: string) => {
@@ -93,21 +100,25 @@ export default function ProfileHeader({
       image_key: key,
     };
 
-    const res = await fetch("http://localhost:8000/foods", {
-      method: "POST",
-      credentials: "include", // 👈 important if using auth cookies
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(foodieMetaData),
-    });
+    try {
+      const res = await fetch("http://localhost:8000/foods", {
+        method: "POST",
+        credentials: "include", // 👈 important if using auth cookies
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(foodieMetaData),
+      });
 
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(err);
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err);
+      }
+
+      return res.json();
+    } catch (errorResponse) {
+      setError(errorResponse as Error);
     }
-
-    return res.json();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -134,12 +145,27 @@ export default function ProfileHeader({
     setOpenMetaDialog(true);
   }
 
+    if (error) {
+    return (
+      <Box sx={{ p: 2 }}>
+        <Alert severity="error">{error.message}</Alert>
+      </Box>
+    );
+  }
+
   return (
     <>
       <Grid
         size={{ xs: 6 }}
         // sx={{ marginTop: "25px", border: "3px solid red", maxWidth: "100%" }}
-        sx={{ width: "100%", overflow: "hidden", boxSizing: "border-box", marginTop: "25px", border: "3px solid red", maxWidth: "100%" }}
+        sx={{
+          width: "100%",
+          overflow: "hidden",
+          boxSizing: "border-box",
+          marginTop: "25px",
+          border: "3px solid red",
+          maxWidth: "100%",
+        }}
         id="homepage"
       >
         <Avatar id="profile_img" src="/broken-image.jpg" />
