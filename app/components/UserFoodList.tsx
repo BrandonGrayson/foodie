@@ -17,7 +17,6 @@ import ProfileFoodDialog from "./ProfileFoodDialog";
 export default function UserFoodList() {
   const [open, setOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [error, setError] = useState<Error | null>(null);
 
   const { foodList } = useUI();
 
@@ -25,8 +24,6 @@ export default function UserFoodList() {
     setCurrentIndex(index);
     setOpen(true);
   };
-
-  console.log("foodItems, FoodList", foodList);
 
   return (
     <Grid

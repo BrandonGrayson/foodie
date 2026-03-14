@@ -6,6 +6,7 @@ import {
   DialogTitle,
   Box,
   Alert,
+  Stack,
 } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
@@ -151,7 +152,7 @@ export default function ProfileFoodDialog({
       open={open}
       onClose={handleClose}
     >
-      <DialogTitle
+      {/* <DialogTitle
         id="food-title"
         sx={{
           maxWidth: 800,
@@ -160,7 +161,7 @@ export default function ProfileFoodDialog({
         }}
       >
         {foodItem.name}
-      </DialogTitle>
+      </DialogTitle> */}
       <IconButton
         aria-label="close"
         onClick={handleClose}
@@ -173,91 +174,96 @@ export default function ProfileFoodDialog({
       >
         <CloseIcon />
       </IconButton>
-      <DialogContent sx={{ p: 0 }}>
+      <DialogContent
+        sx={{
+          p: 0,
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          height: { md: 600 },
+        }}
+      >
+        {/* LEFT SIDE */}
         <Box
           {...handlers}
           sx={{
+            width: { xs: "100%", md: "50%" },
+            height: { xs: "60vh", md: "100%" },
             position: "relative",
-            width: "100%",
-            maxWidth: 800,
-            margin: "0 auto",
-            aspectRatio: "4 / 3",
           }}
         >
           <Image
-            alt="user favorites"
-            width={1200}
-            height={800}
-            priority={true}
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-            }}
-            sizes="(max-width: 600px) 100vw, (max-width: 1200px) 80vw, 800px"
             src={foodItem.url}
+            alt="user favorites"
+            fill
+            priority
+            style={{ objectFit: "cover" }}
+            sizes="(max-width: 900px) 100vw, 50vw"
           />
-
-          {!isMobile && (
-            <IconButton
-              onClick={handlePrev}
-              sx={{
-                position: "absolute",
-                left: 12,
-                top: "50%",
-                transform: "translateY(-50%)",
-                backgroundColor: "rgba(0,0,0,0.4)",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "rgba(0,0,0,0.6)",
-                },
-              }}
-            >
-              ←
-            </IconButton>
-          )}
-
-          {/* Left Arrow */}
-
-          {/* Right Arrow */}
-          {!isMobile && (
-            <IconButton
-              onClick={handleNext}
-              sx={{
-                position: "absolute",
-                right: 12,
-                top: "50%",
-                transform: "translateY(-50%)",
-                backgroundColor: "rgba(0,0,0,0.4)",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "rgba(0,0,0,0.6)",
-                },
-              }}
-            >
-              →
-            </IconButton>
-          )}
         </Box>
-        <Box sx={{ p: 2 }}>
-          <DialogContentText>{foodItem.description}</DialogContentText>
-        </Box>
-        <Box>
-          <IconButton aria-label="likes" onClick={handleUserLike}>
-            <FavoriteIcon
-              color={isLiked ? "error" : "inherit"}
-              sx={{
-                transition: "transform 0.15s",
-                "&:active": { transform: "scale(1.2)" },
-              }}
-            />
-          </IconButton>
-          <IconButton aria-label="comments">
-            <ModeCommentIcon />
-          </IconButton>
-          <IconButton aria-label="favorites">
-            <BookmarkIcon />
-          </IconButton>
+
+        {/* RIGHT SIDE */}
+        <Box
+          sx={{
+            width: { xs: "100%", md: "50%" },
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <Box sx={{ p: 2 }}>
+            <DialogContentText>{foodItem.description}</DialogContentText>
+          </Box>
+
+          <Box>
+            <Stack direction="row" spacing={1}>
+              <IconButton aria-label="likes" onClick={handleUserLike}>
+                <FavoriteIcon
+                  color={isLiked ? "error" : "inherit"}
+                  sx={{
+                    transition: "transform 0.15s",
+                    "&:active": { transform: "scale(1.2)" },
+                  }}
+                />
+              </IconButton>
+              <IconButton aria-label="comments">
+                <ModeCommentIcon />
+              </IconButton>
+              <IconButton aria-label="favorites">
+                <BookmarkIcon />
+              </IconButton>
+              {!isMobile && (
+                <IconButton
+                  onClick={handlePrev}
+                  sx={{
+                    backgroundColor: "rgba(0,0,0,0.4)",
+                    color: "white",
+                    "&:hover": {
+                      backgroundColor: "rgba(0,0,0,0.6)",
+                    },
+                  }}
+                >
+                  ←
+                </IconButton>
+              )}
+
+              {/* Left Arrow */}
+
+              {/* Right Arrow */}
+              {!isMobile && (
+                <IconButton
+                  onClick={handleNext}
+                  sx={{
+                    backgroundColor: "rgba(0,0,0,0.4)",
+                    color: "white",
+                    "&:hover": {
+                      backgroundColor: "rgba(0,0,0,0.6)",
+                    },
+                  }}
+                >
+                  →
+                </IconButton>
+              )}
+            </Stack>
+          </Box>
         </Box>
       </DialogContent>
     </Dialog>
