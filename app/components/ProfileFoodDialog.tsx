@@ -13,6 +13,7 @@ import {
   ListItemText,
   ListItemAvatar,
   Avatar,
+  Button,
 } from "@mui/material";
 
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -76,7 +77,6 @@ export default function ProfileFoodDialog({
   open,
   setOpen,
 }: ProfileDialogProps) {
-
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -84,8 +84,10 @@ export default function ProfileFoodDialog({
   const [error, setError] = useState<Error | null>(null);
 
   const [foodCache, setFoodCache] = useState<Record<number, FoodInteractions>>(
-    {}
+    {},
   );
+  const [focused, setFocused] = useState(false);
+  const [commentText, setCommentText] = useState("");
 
   /* ---------------------------
      SAFE DERIVED VALUES
@@ -98,7 +100,7 @@ export default function ProfileFoodDialog({
       ? foodList[(currentIndex + 1) % foodList.length]
       : undefined;
 
-  const foodData = foodItem ? foodCache[foodItem.id] ?? {} : {};
+  const foodData = foodItem ? (foodCache[foodItem.id] ?? {}) : {};
 
   const comments = foodData.comments ?? [];
   const isLiked = foodData.liked ?? false;
@@ -112,7 +114,6 @@ export default function ProfileFoodDialog({
 
     const loadLikes = async () => {
       try {
-
         const res = await fetch("http://localhost:8000/foods/likes", {
           credentials: "include",
         });
@@ -135,14 +136,12 @@ export default function ProfileFoodDialog({
 
           return updated;
         });
-
       } catch (err) {
         setError(err as Error);
       }
     };
 
     loadLikes();
-
   }, [foodList]);
 
   /* ---------------------------
@@ -150,19 +149,16 @@ export default function ProfileFoodDialog({
   --------------------------- */
 
   useEffect(() => {
-
     if (!open) return;
     if (!foodItem) return;
 
     const loadComments = async () => {
-
       if (foodCache[foodItem.id]?.comments) return;
 
       try {
-
         const res = await fetch(
           `http://localhost:8000/foods/${foodItem.id}/comments`,
-          { credentials: "include" }
+          { credentials: "include" },
         );
 
         if (!res.ok) throw new Error("Failed to fetch comments");
@@ -176,14 +172,12 @@ export default function ProfileFoodDialog({
             comments: data,
           },
         }));
-
       } catch (err) {
         setError(err as Error);
       }
     };
 
     loadComments();
-
   }, [foodItem, open]);
 
   /* ---------------------------
@@ -191,18 +185,15 @@ export default function ProfileFoodDialog({
   --------------------------- */
 
   useEffect(() => {
-
     if (!open) return;
     if (!nextFood) return;
     if (foodCache[nextFood.id]?.comments) return;
 
     const prefetchNext = async () => {
-
       try {
-
         const res = await fetch(
           `http://localhost:8000/foods/${nextFood.id}/comments`,
-          { credentials: "include" }
+          { credentials: "include" },
         );
 
         if (!res.ok) return;
@@ -216,12 +207,10 @@ export default function ProfileFoodDialog({
             comments: data,
           },
         }));
-
       } catch {}
     };
 
     prefetchNext();
-
   }, [nextFood, open]);
 
   /* ---------------------------
@@ -233,9 +222,7 @@ export default function ProfileFoodDialog({
   };
 
   const handlePrev = () => {
-    setCurrentIndex((prev) =>
-      prev === 0 ? foodList.length - 1 : prev - 1
-    );
+    setCurrentIndex((prev) => (prev === 0 ? foodList.length - 1 : prev - 1));
   };
 
   const handleClose = () => {
@@ -248,23 +235,58 @@ export default function ProfileFoodDialog({
     trackMouse: true,
   });
 
+  const handleCommentAdded = async () => {
+    if (!foodItem) return;
+
+    const comment = {
+      "text": commentText
+    }
+
+    try {
+      const req = await fetch(
+        `http://localhost:8000/foods/comments/${foodItem.id}`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(comment)
+        },
+      );
+
+      if (!req.ok) return;
+
+      const data = await req.json()
+
+      setFoodCache((prev) => ({
+        ...prev,
+        [foodItem.id]: {
+          ...prev[foodItem.id],
+          comments: [
+            ...(prev[foodItem.id]?.comments ?? []),
+            data
+          ]
+        },
+      }));
+    } catch (err) {
+      setError(err as Error);
+    }
+  };
+
   /* ---------------------------
      LIKE
   --------------------------- */
 
   const handleUserLike = async () => {
-
     if (!foodItem) return;
 
     try {
-
       const res = await fetch(
         `http://localhost:8000/foods/${foodItem.id}/like`,
         {
           method: "POST",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
 
       if (!res.ok) return;
@@ -276,7 +298,6 @@ export default function ProfileFoodDialog({
           liked: !prev[foodItem.id]?.liked,
         },
       }));
-
     } catch (err) {
       setError(err as Error);
     }
@@ -299,6 +320,8 @@ export default function ProfileFoodDialog({
   /* ---------------------------
      UI
   --------------------------- */
+
+  console.log("comments", comments);
 
   return (
     <Dialog
@@ -359,9 +382,7 @@ export default function ProfileFoodDialog({
           }}
         >
           <Box sx={{ p: 2 }}>
-            <DialogContentText>
-              {foodItem?.description}
-            </DialogContentText>
+            <DialogContentText>{foodItem?.description}</DialogContentText>
           </Box>
 
           {!isMobile && (
@@ -388,12 +409,10 @@ export default function ProfileFoodDialog({
           <Box sx={{ p: 1 }}>
             <Stack direction="row" spacing={0.5}>
               <IconButton onClick={handleUserLike}>
-                <FavoriteIcon
-                  color={isLiked ? "error" : "inherit"}
-                />
+                <FavoriteIcon color={isLiked ? "error" : "inherit"} />
               </IconButton>
 
-              <IconButton>
+              <IconButton onClick={() => setFocused(true)}>
                 <ModeCommentIcon />
               </IconButton>
 
@@ -408,12 +427,22 @@ export default function ProfileFoodDialog({
                 </>
               )}
             </Stack>
-
-            <TextField
-              fullWidth
-              placeholder="Add a comment"
-              sx={{ mt: 1 }}
-            />
+            <Stack direction="row">
+              <TextField
+                fullWidth
+                placeholder="Add a comment"
+                sx={{ mt: 1 }}
+                focused={focused}
+                value={commentText}
+                onChange={(event) => setCommentText(event.target.value)}
+              />
+              <Button
+                onClick={handleCommentAdded}
+                disabled={commentText.length === 0}
+              >
+                Post
+              </Button>
+            </Stack>
           </Box>
         </Box>
       </DialogContent>
