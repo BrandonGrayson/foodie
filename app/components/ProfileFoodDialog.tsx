@@ -29,7 +29,7 @@ import ImageIcon from "@mui/icons-material/Image";
 import Image from "next/image";
 import { useSwipeable } from "react-swipeable";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface FoodItem {
   description: string;
@@ -65,7 +65,7 @@ interface Likes {
 }
 
 interface Bookmarks {
-  food_id: number
+  food_id: number;
 }
 
 interface FoodInteractions {
@@ -74,9 +74,8 @@ interface FoodInteractions {
   bookmarked?: boolean;
 }
 
-interface ToggleBookMark {
-  favorited: string;
-  food_id: number
+interface Favorites {
+  food_id: number;
 }
 
 export default function ProfileFoodDialog({
@@ -97,6 +96,7 @@ export default function ProfileFoodDialog({
   );
   const [focused, setFocused] = useState(false);
   const [commentText, setCommentText] = useState("");
+  const hasLoadedBookmarks = useRef(false);
 
   /* ---------------------------
      SAFE DERIVED VALUES
@@ -113,7 +113,7 @@ export default function ProfileFoodDialog({
 
   const comments = foodData.comments ?? [];
   const isLiked = foodData.liked ?? false;
-  
+  const isBookmarked = foodData.bookmarked ?? false;
 
   /* ---------------------------
      LOAD LIKES
@@ -224,6 +224,48 @@ export default function ProfileFoodDialog({
   }, [nextFood, open]);
 
   /* ---------------------------
+     BOOKMARKED ITEMS
+  --------------------------- */
+
+  useEffect(() => {
+    if (!foodList.length) return;
+
+    const loadBookMarks = async () => {
+      if (!foodList.length || hasLoadedBookmarks.current) return;
+      
+      try {
+        const res = await fetch("http://localhost:8000/profile/foods/favorites", {
+          credentials: "include",
+        });
+
+        if (!res.ok) throw new Error("Failed to fetch BookMarks");
+
+        const data = await res.json()
+        const bookmarkedSet = new Set(data.map((item: Favorites) => item.food_id))
+
+        setFoodCache((prev) => {
+          const updated = {...prev}
+
+          foodList.forEach((food) => {
+            updated[food.id] = {
+              ...(updated[food.id] ?? {}),
+              bookmarked: bookmarkedSet.has(food.id)
+            }
+          })
+
+          return updated
+        })
+
+        
+      } catch (error) {
+        setError(error as Error);
+      }
+    };
+    hasLoadedBookmarks.current = true;
+    loadBookMarks()
+  }, [foodList]);
+
+  /* ---------------------------
      NAVIGATION
   --------------------------- */
 
@@ -324,15 +366,15 @@ export default function ProfileFoodDialog({
 
       if (!req.ok) return;
 
-      const data = await req.json()
+      const data = await req.json();
 
       setFoodCache((prev) => ({
         ...prev,
         [foodItem.id]: {
-          ...prev[foodItem.id],
-          bookmarked: data.favorited
-        }
-      }))
+          ...(prev[foodItem.id] ?? {}),
+          bookmarked: data.favorited,
+        },
+      }));
     } catch (err) {
       setError(err as Error);
     }
@@ -452,7 +494,7 @@ export default function ProfileFoodDialog({
               </IconButton>
 
               <IconButton onClick={handleBookmarkedItem}>
-                <BookmarkIcon />
+                <BookmarkIcon color={isBookmarked ? "warning" : "inherit"} />
               </IconButton>
 
               {!isMobile && (
