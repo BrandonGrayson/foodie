@@ -64,10 +64,6 @@ interface Likes {
   food_id: number;
 }
 
-interface Bookmarks {
-  food_id: number;
-}
-
 interface FoodInteractions {
   comments?: Comment[];
   liked?: boolean;
@@ -232,7 +228,7 @@ export default function ProfileFoodDialog({
 
     const loadBookMarks = async () => {
       if (!foodList.length || hasLoadedBookmarks.current) return;
-      
+
       try {
         const res = await fetch("http://localhost:8000/profile/foods/favorites", {
           credentials: "include",
@@ -256,12 +252,12 @@ export default function ProfileFoodDialog({
           return updated
         })
 
-        
+         hasLoadedBookmarks.current = true;
       } catch (error) {
         setError(error as Error);
       }
     };
-    hasLoadedBookmarks.current = true;
+   
     loadBookMarks()
   }, [foodList]);
 
@@ -398,7 +394,8 @@ export default function ProfileFoodDialog({
      UI
   --------------------------- */
 
-  console.log("comments", comments);
+  console.log("isBookmarked", isBookmarked);
+  console.log("isLiked", isLiked);
 
   return (
     <Dialog
@@ -477,7 +474,7 @@ export default function ProfileFoodDialog({
                       <ImageIcon />
                     </Avatar>
                   </ListItemAvatar>
-                  <ListItemText primary={comment.text} />
+                  <ListItemText sx={{display: 'flex', flexWrap: 'wrap'}} primary={comment.text} />
                 </ListItem>
               ))}
             </List>
