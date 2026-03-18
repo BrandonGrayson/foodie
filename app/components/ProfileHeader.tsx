@@ -213,14 +213,14 @@ export default function ProfileHeader({
             />
           </Link>
           <Link href="/profile/favorites">
-            <FavoriteIcon sx={{ height: "4em", cursor: "pointer" }} />
+            <BookmarkIcon sx={{ height: "4em", cursor: "pointer" }} />
           </Link>
-          <Link href="/profile/recipes">
+          {/* <Link href="/profile/recipes">
             <BookmarkIcon sx={{ height: "4em", cursor: "pointer" }} />
           </Link>
           <Link href="/profile/tagged">
             <BookmarkAddIcon sx={{ height: "4em", cursor: "pointer" }} />
-          </Link>
+          </Link> */}
         </Stack>
       </Grid>
       <Dialog open={openMetaDialog} onClose={handleClose}>

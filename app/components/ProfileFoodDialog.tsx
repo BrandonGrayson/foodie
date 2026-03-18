@@ -64,10 +64,19 @@ interface Likes {
   food_id: number;
 }
 
+interface Bookmarks {
+  food_id: number
+}
+
 interface FoodInteractions {
   comments?: Comment[];
   liked?: boolean;
   bookmarked?: boolean;
+}
+
+interface ToggleBookMark {
+  favorited: string;
+  food_id: number
 }
 
 export default function ProfileFoodDialog({
@@ -104,6 +113,7 @@ export default function ProfileFoodDialog({
 
   const comments = foodData.comments ?? [];
   const isLiked = foodData.liked ?? false;
+  
 
   /* ---------------------------
      LOAD LIKES
@@ -239,8 +249,8 @@ export default function ProfileFoodDialog({
     if (!foodItem) return;
 
     const comment = {
-      "text": commentText
-    }
+      text: commentText,
+    };
 
     try {
       const req = await fetch(
@@ -249,22 +259,21 @@ export default function ProfileFoodDialog({
           method: "POST",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(comment)
+          body: JSON.stringify(comment),
         },
       );
 
       if (!req.ok) return;
 
-      const data = await req.json()
+      const data = await req.json();
+
+      setCommentText("");
 
       setFoodCache((prev) => ({
         ...prev,
         [foodItem.id]: {
           ...prev[foodItem.id],
-          comments: [
-            ...(prev[foodItem.id]?.comments ?? []),
-            data
-          ]
+          comments: [data, ...(prev[foodItem.id]?.comments ?? [])],
         },
       }));
     } catch (err) {
@@ -298,6 +307,32 @@ export default function ProfileFoodDialog({
           liked: !prev[foodItem.id]?.liked,
         },
       }));
+    } catch (err) {
+      setError(err as Error);
+    }
+  };
+
+  const handleBookmarkedItem = async () => {
+    try {
+      const req = await fetch(
+        `http://localhost:8000/foods/${foodItem.id}/favorites`,
+        {
+          method: "POST",
+          credentials: "include",
+        },
+      );
+
+      if (!req.ok) return;
+
+      const data = await req.json()
+
+      setFoodCache((prev) => ({
+        ...prev,
+        [foodItem.id]: {
+          ...prev[foodItem.id],
+          bookmarked: data.favorited
+        }
+      }))
     } catch (err) {
       setError(err as Error);
     }
@@ -416,7 +451,7 @@ export default function ProfileFoodDialog({
                 <ModeCommentIcon />
               </IconButton>
 
-              <IconButton>
+              <IconButton onClick={handleBookmarkedItem}>
                 <BookmarkIcon />
               </IconButton>
 
