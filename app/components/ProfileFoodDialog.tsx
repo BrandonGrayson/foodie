@@ -14,6 +14,7 @@ import {
   ListItemAvatar,
   Avatar,
   Button,
+  Rating
 } from "@mui/material";
 
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -455,8 +456,11 @@ export default function ProfileFoodDialog({
             flexDirection: "column",
           }}
         >
-          <Box sx={{ p: 2 }}>
+          <Box sx={{ pt: 2, pl: 2, pb: 1 }}>
             <DialogContentText>{foodItem?.description}</DialogContentText>
+          </Box>
+          <Box sx={{pl: 2}}>
+            <Rating name="read-only" value={foodItem?.grade} readOnly />
           </Box>
 
           {!isMobile && (
