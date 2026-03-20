@@ -14,7 +14,8 @@ import {
   ListItemAvatar,
   Avatar,
   Button,
-  Rating
+  Rating,
+  Divider,
 } from "@mui/material";
 
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -29,7 +30,7 @@ import ImageIcon from "@mui/icons-material/Image";
 
 import Image from "next/image";
 import { useSwipeable } from "react-swipeable";
-
+import { useUI } from "../providers/providers";
 import { useState, useEffect, useRef } from "react";
 
 interface FoodItem {
@@ -111,6 +112,7 @@ export default function ProfileFoodDialog({
   const comments = foodData.comments ?? [];
   const isLiked = foodData.liked ?? false;
   const isBookmarked = foodData.bookmarked ?? false;
+  const { user } = useUI();
 
   /* ---------------------------
      LOAD LIKES
@@ -231,35 +233,40 @@ export default function ProfileFoodDialog({
       if (!foodList.length || hasLoadedBookmarks.current) return;
 
       try {
-        const res = await fetch("http://localhost:8000/profile/foods/favorites", {
-          credentials: "include",
-        });
+        const res = await fetch(
+          "http://localhost:8000/profile/foods/favorites",
+          {
+            credentials: "include",
+          },
+        );
 
         if (!res.ok) throw new Error("Failed to fetch BookMarks");
 
-        const data = await res.json()
-        const bookmarkedSet = new Set(data.map((item: Favorites) => item.food_id))
+        const data = await res.json();
+        const bookmarkedSet = new Set(
+          data.map((item: Favorites) => item.food_id),
+        );
 
         setFoodCache((prev) => {
-          const updated = {...prev}
+          const updated = { ...prev };
 
           foodList.forEach((food) => {
             updated[food.id] = {
               ...(updated[food.id] ?? {}),
-              bookmarked: bookmarkedSet.has(food.id)
-            }
-          })
+              bookmarked: bookmarkedSet.has(food.id),
+            };
+          });
 
-          return updated
-        })
+          return updated;
+        });
 
-         hasLoadedBookmarks.current = true;
+        hasLoadedBookmarks.current = true;
       } catch (error) {
         setError(error as Error);
       }
     };
-   
-    loadBookMarks()
+
+    loadBookMarks();
   }, [foodList]);
 
   /* ---------------------------
@@ -456,12 +463,33 @@ export default function ProfileFoodDialog({
             flexDirection: "column",
           }}
         >
-          <Box sx={{ pt: 2, pl: 2, pb: 1 }}>
+          <Box>
+            <ListItem>
+              <ListItemAvatar>
+                <Avatar>
+                  <ImageIcon />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText
+                sx={{ display: "flex", flexWrap: "wrap" }}
+                primary={user.user_name}
+              />
+            </ListItem>
+            <Divider />
+          </Box>
+          {/* <Box sx={{ pt: 2, pl: 2, pb: 1 }}>
             <DialogContentText>{foodItem?.description}</DialogContentText>
           </Box>
-          <Box sx={{pl: 2}}>
+          <Box sx={{ pl: 2 }}>
             <Rating name="read-only" value={foodItem?.grade} readOnly />
-          </Box>
+          </Box> */}
+          <Stack sx={{pt: 2, pl: 2}} direction="column" spacing={1}>
+            <DialogContentText>{foodItem?.name}</DialogContentText>
+            <DialogContentText>{foodItem?.description}</DialogContentText>
+            <DialogContentText>{foodItem?.location}</DialogContentText>
+            <DialogContentText>{foodItem?.type}</DialogContentText>
+            <Rating name="read-only" value={foodItem?.grade} readOnly />
+          </Stack>
 
           {!isMobile && (
             <List
@@ -478,7 +506,10 @@ export default function ProfileFoodDialog({
                       <ImageIcon />
                     </Avatar>
                   </ListItemAvatar>
-                  <ListItemText sx={{display: 'flex', flexWrap: 'wrap'}} primary={comment.text} />
+                  <ListItemText
+                    sx={{ display: "flex", flexWrap: "wrap" }}
+                    primary={comment.text}
+                  />
                 </ListItem>
               ))}
             </List>

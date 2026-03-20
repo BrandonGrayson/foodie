@@ -100,7 +100,7 @@ export default async function ProfileLayout({
   const followers = await getUserFollowers();
 
   return (
-    <ProfileProviders initialFoodList={foodItems}>
+    <ProfileProviders initialFoodList={foodItems} user={user}>
       <div
         style={{ width: "100%", overflow: "hidden", boxSizing: "border-box" }}
       >

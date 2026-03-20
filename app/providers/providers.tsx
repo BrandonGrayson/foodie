@@ -22,9 +22,14 @@ interface FoodItem {
   created_at: string;
 }
 
+interface User {
+  user_name: string
+}
+
 interface UIContextType {
   foodList: FoodItem[];
   setFoodList: Dispatch<SetStateAction<FoodItem[]>>;
+  user: User
 }
 
 const UIContext = createContext<UIContextType | null>(null);
@@ -41,15 +46,17 @@ export function useUI() {
 
 export default function ProfileProviders({
   children,
-  initialFoodList
+  initialFoodList,
+  user
 }: {
   children: ReactNode;
   initialFoodList: FoodItem[];
+  user: User
 }) {
   const [foodList, setFoodList] = useState<FoodItem[]>(initialFoodList);
 
   return (
-    <UIContext.Provider value={{ foodList, setFoodList }}>
+    <UIContext.Provider value={{ foodList, setFoodList, user }}>
         {children}
     </UIContext.Provider>
   );
