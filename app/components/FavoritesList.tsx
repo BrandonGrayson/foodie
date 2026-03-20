@@ -2,6 +2,7 @@
 import Grid from "@mui/material/Grid";
 import FoodGrid from "./FoodGrid";
 import { useState } from "react";
+import ProfileFoodDialog from "./ProfileFoodDialog";
 
 interface FoodItem {
   description: string;
@@ -28,6 +29,7 @@ export default function FavoritesList({foodList}: FavoritesListProps) {
   return (
     <Grid container>
       <FoodGrid foodList={foodList} setOpen={setOpen} setCurrentIndex={setCurrentIndex} />
+      <ProfileFoodDialog foodList={foodList} open={open} setOpen={setOpen} currentIndex={currentIndex} setCurrentIndex={setCurrentIndex} />
     </Grid>
   );
 }
