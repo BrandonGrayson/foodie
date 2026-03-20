@@ -282,6 +282,7 @@ export default function ProfileFoodDialog({
   };
 
   const handleClose = () => {
+    console.log('handle close clicked')
     setOpen(false);
   };
 
@@ -402,8 +403,7 @@ export default function ProfileFoodDialog({
      UI
   --------------------------- */
 
-  console.log("isBookmarked", isBookmarked);
-  console.log("isLiked", isLiked);
+  console.log("open", open);
 
   return (
     <Dialog
@@ -421,6 +421,7 @@ export default function ProfileFoodDialog({
           right: 8,
           top: 8,
           color: theme.palette.grey[500],
+          zIndex: 9999, // 👈 add this
         })}
       >
         <CloseIcon />
