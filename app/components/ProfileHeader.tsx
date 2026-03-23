@@ -145,7 +145,7 @@ export default function ProfileHeader({
     setOpenMetaDialog(true);
   }
 
-    if (error) {
+  if (error) {
     return (
       <Box sx={{ p: 2 }}>
         <Alert severity="error">{error.message}</Alert>
@@ -163,33 +163,38 @@ export default function ProfileHeader({
           overflow: "hidden",
           boxSizing: "border-box",
           marginTop: "25px",
-          border: "3px solid red",
           maxWidth: "100%",
         }}
         id="homepage"
       >
-        <Avatar id="profile_img" src="/broken-image.jpg" />
-      </Grid>
-      <Grid
-        size={{ xs: 6 }}
-        sx={{ marginTop: "25px", border: "3px solid red", maxWidth: "100%" }}
-        id="homepage"
-      >
-        <Typography>{user.user_name}</Typography>
-        <Typography>{user.full_name}</Typography>
-        <Stack direction="row" spacing={1}>
-          <Stack>
-            <Typography>{foodList.length}</Typography>
-            <Typography>Posts</Typography>
-          </Stack>
-          <Stack>
-            <Typography>{followers.length}</Typography>
-            <Typography>Followers</Typography>
-          </Stack>
-          <Stack>
-            <Typography>{following.length}</Typography>
-            <Typography>Following</Typography>
-          </Stack>
+        <Stack direction="row" spacing={3} justifyContent="center">
+          <Avatar
+            id="profile_img"
+            src="/broken-image.jpg"
+            sx={{
+              width: { xs: 48, sm: 56, md: 64, lg: 80 },
+              height: { xs: 47, sm: 56, md: 64, lg: 80 },
+            }}
+          />
+
+          <Box>
+            <Typography>{user.user_name}</Typography>
+            <Typography>{user.full_name}</Typography>
+            <Stack direction="row" spacing={1}>
+              <Stack>
+                <Typography>{foodList.length}</Typography>
+                <Typography>Posts</Typography>
+              </Stack>
+              <Stack>
+                <Typography>{followers.length}</Typography>
+                <Typography>Followers</Typography>
+              </Stack>
+              <Stack>
+                <Typography>{following.length}</Typography>
+                <Typography>Following</Typography>
+              </Stack>
+            </Stack>
+          </Box>
         </Stack>
       </Grid>
       <Grid size={12}>
