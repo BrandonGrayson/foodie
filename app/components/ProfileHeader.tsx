@@ -16,11 +16,11 @@ import { useState } from "react";
 import Grid from "@mui/material/Grid";
 import Avatar from "@mui/material/Avatar";
 import AppsIcon from "@mui/icons-material/Apps";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import BookmarkAddIcon from "@mui/icons-material/BookmarkAdd";
+import IconButton from "@mui/material/IconButton";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import Link from "next/link";
 import { useUI } from "../providers/providers";
+import { FoodItem } from "../schemas/schemas";
 
 interface User {
   created_at: string;
@@ -44,12 +44,14 @@ interface ProfileHeaderProps {
   user: User;
   following: Following[];
   followers: Followers[];
+  highlights: FoodItem[];
 }
 
 export default function ProfileHeader({
   user,
   following,
   followers,
+  highlights,
 }: ProfileHeaderProps) {
   const [preview, setPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -61,6 +63,23 @@ export default function ProfileHeader({
   const [type, setType] = useState("");
   const { foodList, setFoodList } = useUI();
   const [error, setError] = useState<Error | null>(null);
+  const [page, setPage] = useState(0);
+  const PAGE_SIZE = 6;
+
+  const totalPages = Math.ceil(highlights.length / PAGE_SIZE);
+
+  const handleNext = () => {
+    setPage((prev) => (prev + 1) % totalPages); // loop
+  };
+
+  const handlePrev = () => {
+    setPage((prev) => (prev - 1 + totalPages) % totalPages); // loop backwards
+  };
+
+  const visibleFoods = highlights.slice(
+    page * PAGE_SIZE,
+    page * PAGE_SIZE + PAGE_SIZE,
+  );
 
   const handleClose = () => {
     setOpenMetaDialog(false);
@@ -145,6 +164,8 @@ export default function ProfileHeader({
     setOpenMetaDialog(true);
   }
 
+  console.log("highlights", highlights);
+
   if (error) {
     return (
       <Box sx={{ p: 2 }}>
@@ -167,35 +188,77 @@ export default function ProfileHeader({
         }}
         id="homepage"
       >
-        <Stack direction="row" spacing={3} justifyContent="center">
-          <Avatar
-            id="profile_img"
-            src="/broken-image.jpg"
-            sx={{
-              width: { xs: 48, sm: 56, md: 64, lg: 80 },
-              height: { xs: 47, sm: 56, md: 64, lg: 80 },
-            }}
-          />
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: 'column',
+            justifyContent: "center",
+            alignItems: "center",
+            width: "100%",
+            mt: { xs: 2, md: 4 }, // responsive spacing
+          }}
+        >
+          <Stack
+            direction="row"
+            spacing={3}
+            alignItems="center" // 👈 vertically align avatar + text
+          >
+            <Avatar
+              id="profile_img"
+              src="/broken-image.jpg"
+              sx={{
+                width: { xs: 48, sm: 56, md: 64, lg: 80 },
+                height: { xs: 48, sm: 56, md: 64, lg: 80 }, // fix typo (47 → 48)
+              }}
+            />
 
-          <Box>
-            <Typography>{user.user_name}</Typography>
-            <Typography>{user.full_name}</Typography>
-            <Stack direction="row" spacing={1}>
-              <Stack>
-                <Typography>{foodList.length}</Typography>
-                <Typography>Posts</Typography>
+            <Box>
+              <Typography>{user.user_name}</Typography>
+              <Typography>{user.full_name}</Typography>
+
+              <Stack direction="row" spacing={2}>
+                <Stack alignItems="center">
+                  <Typography>{foodList.length}</Typography>
+                  <Typography>Posts</Typography>
+                </Stack>
+
+                <Stack alignItems="center">
+                  <Typography>{followers.length}</Typography>
+                  <Typography>Followers</Typography>
+                </Stack>
+
+                <Stack alignItems="center">
+                  <Typography>{following.length}</Typography>
+                  <Typography>Following</Typography>
+                </Stack>
               </Stack>
-              <Stack>
-                <Typography>{followers.length}</Typography>
-                <Typography>Followers</Typography>
-              </Stack>
-              <Stack>
-                <Typography>{following.length}</Typography>
-                <Typography>Following</Typography>
-              </Stack>
-            </Stack>
+            </Box>
+          </Stack>
+          <Box
+            display="flex"
+            alignItems="center"
+            gap={1}
+            sx={{mt: 2}}
+          >
+            <IconButton sx={{color: 'white'}} onClick={handlePrev}>←</IconButton>
+
+            <Box display="flex" gap={1}>
+              {visibleFoods.map((food) => (
+                <Avatar
+                  key={food.id}
+                  src={food.url}
+                  sx={{
+                    width: { xs: 40, sm: 48, md: 56 },
+                    height: { xs: 40, sm: 48, md: 56 },
+                    cursor: "pointer",
+                  }}
+                />
+              ))}
+            </Box>
+
+            <IconButton sx={{color: 'white'}} onClick={handleNext}>→</IconButton>
           </Box>
-        </Stack>
+        </Box>
       </Grid>
       <Grid size={12}>
         <input

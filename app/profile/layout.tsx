@@ -99,6 +99,26 @@ export default async function ProfileLayout({
 
   const followers = await getUserFollowers();
 
+  const getHighlights = async () => {
+    const req = await fetch("http://localhost:8000/profile/highlights", {
+      method: "GET",
+      headers: {
+        Cookie: cookieHeader,
+      },
+      cache: "no-store",
+    });
+
+    if (!req.ok) {
+      return "There was an error fetching Highlighted Items";
+    }
+
+    const data = await req.json();
+
+    return data
+  };
+
+  const highlights = await getHighlights();
+
   return (
     <ProfileProviders initialFoodList={foodItems} user={user}>
       <div
@@ -108,6 +128,7 @@ export default async function ProfileLayout({
           user={user}
           followers={followers}
           following={following}
+          highlights={highlights}
         />
         {children}
       </div>
