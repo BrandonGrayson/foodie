@@ -28,6 +28,8 @@ interface User {
   id: number;
   user_name: string;
   full_name: string;
+  url: string;
+  bio: string | null;
 }
 
 interface Following {
@@ -53,7 +55,7 @@ export default function ProfileHeader({
   followers,
   highlights,
 }: ProfileHeaderProps) {
-  const [preview, setPreview] = useState<string | null>(null);
+  // const [preview, setPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [openMetaDialog, setOpenMetaDialog] = useState(false);
   const [name, setName] = useState("");
@@ -159,12 +161,12 @@ export default function ProfileHeader({
     if (!selected) return;
 
     setSelectedFile(selected);
-    setPreview(URL.createObjectURL(selected));
+    // setPreview(URL.createObjectURL(selected));
 
     setOpenMetaDialog(true);
   }
 
-  console.log("highlights", highlights);
+  console.log("user", user);
 
   if (error) {
     return (
@@ -191,7 +193,7 @@ export default function ProfileHeader({
         <Box
           sx={{
             display: "flex",
-            flexDirection: 'column',
+            flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
             width: "100%",
@@ -205,7 +207,7 @@ export default function ProfileHeader({
           >
             <Avatar
               id="profile_img"
-              src="/broken-image.jpg"
+              src={user.url}
               sx={{
                 width: { xs: 48, sm: 56, md: 64, lg: 80 },
                 height: { xs: 48, sm: 56, md: 64, lg: 80 }, // fix typo (47 → 48)
@@ -234,13 +236,15 @@ export default function ProfileHeader({
               </Stack>
             </Box>
           </Stack>
-          <Box
-            display="flex"
-            alignItems="center"
-            gap={1}
-            sx={{mt: 2}}
-          >
-            <IconButton sx={{color: 'white'}} onClick={handlePrev}>←</IconButton>
+          {user.bio ? (
+            <Box>
+              <Typography>{user.bio}</Typography>
+            </Box>
+          ) : null}
+          <Box display="flex" alignItems="center" gap={1} sx={{ mt: 2 }}>
+            <IconButton sx={{ color: "white" }} onClick={handlePrev}>
+              ←
+            </IconButton>
 
             <Box display="flex" gap={1}>
               {visibleFoods.map((food) => (
@@ -256,7 +260,9 @@ export default function ProfileHeader({
               ))}
             </Box>
 
-            <IconButton sx={{color: 'white'}} onClick={handleNext}>→</IconButton>
+            <IconButton sx={{ color: "white" }} onClick={handleNext}>
+              →
+            </IconButton>
           </Box>
         </Box>
       </Grid>
@@ -269,9 +275,9 @@ export default function ProfileHeader({
           onChange={handleChange}
         />
 
-        {preview && (
+        {/* {preview && (
           <Avatar src={preview} sx={{ width: 100, height: 100, mt: 2 }} />
-        )}
+        )} */}
       </Grid>
       <Grid size={12} sx={{ display: "flex", justifyContent: "center" }}>
         <Stack direction="row" spacing={10}>
@@ -299,46 +305,52 @@ export default function ProfileHeader({
           </DialogContentText>
         </DialogContent>
         <form onSubmit={handleSubmit}>
-          <TextField
-            id="outlined-controlled"
-            label="Name"
-            value={name}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setName(event.target.value);
-            }}
-          />
-          <TextField
-            id="outlined-controlled"
-            label="Type"
-            value={type}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setType(event.target.value);
-            }}
-          />
-          <TextField
-            id="outlined-controlled"
-            label="Description"
-            value={description}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setDescription(event.target.value);
-            }}
-          />
-          <TextField
-            id="outlined-controlled"
-            label="Overall Grade"
-            value={grade}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setGrade(parseInt(event.target.value));
-            }}
-          />
-          <TextField
-            id="outlined-controlled"
-            label="Location"
-            value={location}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setLocation(event.target.value);
-            }}
-          />
+          <Stack sx={{m: 2}} spacing={2}>
+            <TextField
+              id="outlined-controlled"
+              label="Name"
+              value={name}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setName(event.target.value);
+              }}
+            />
+            <TextField
+              id="outlined-controlled"
+              label="Type"
+              value={type}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setType(event.target.value);
+              }}
+            />
+            <TextField
+              id="outlined-controlled"
+              label="Description"
+              value={description}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setDescription(event.target.value);
+              }}
+            />
+            <TextField
+              id="outlined-controlled"
+              label="Overall Grade"
+              type="number"
+              value={grade}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setGrade(parseInt(event.target.value));
+              }}
+              slotProps={{
+                htmlInput: { max: 5 }
+              }}
+            />
+            <TextField
+              id="outlined-controlled"
+              label="Location"
+              value={location}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setLocation(event.target.value);
+              }}
+            />
+          </Stack>
           <DialogActions>
             <Button type="submit">Submit</Button>
             <Button>Cancel</Button>

@@ -15,7 +15,7 @@ export default async function ProfileLayout({
     .map((cookie) => `${cookie.name}=${cookie.value}`)
     .join("; ");
 
-  const res = await fetch("http://localhost:8000/me", {
+  const res = await fetch("http://localhost:8000/profile", {
     headers: {
       Cookie: cookieHeader,
     },
