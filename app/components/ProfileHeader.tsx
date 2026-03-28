@@ -12,7 +12,7 @@ import {
   Box,
   Alert,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid";
 import Avatar from "@mui/material/Avatar";
 import AppsIcon from "@mui/icons-material/Apps";
@@ -20,7 +20,7 @@ import IconButton from "@mui/material/IconButton";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import Link from "next/link";
 import { useUI } from "../providers/providers";
-import { FoodItem } from "../schemas/schemas";
+import { FoodItem, UserUpdate } from "../schemas/schemas";
 
 interface User {
   created_at: string;
@@ -30,6 +30,7 @@ interface User {
   full_name: string;
   url: string;
   bio: string | null;
+  phone_number: string;
 }
 
 interface Following {
@@ -66,7 +67,19 @@ export default function ProfileHeader({
   const { foodList, setFoodList } = useUI();
   const [error, setError] = useState<Error | null>(null);
   const [page, setPage] = useState(0);
+  const [openProfile, setOpenProfile] = useState(false);
+  const [bio, setUserBio] = useState("");
+  const [profileFile, setProfileFile] = useState<File | null>(null);
+  const [phoneNumber, setPhoneNumber] = useState(user.phone_number);
   const PAGE_SIZE = 6;
+
+  useEffect(() => {
+    if (!user.bio) {
+      setUserBio("");
+    } else if (user.bio) {
+      setUserBio(user.bio);
+    }
+  }, []);
 
   const totalPages = Math.ceil(highlights.length / PAGE_SIZE);
 
@@ -142,6 +155,41 @@ export default function ProfileHeader({
     }
   };
 
+  const uploadUserData = async () => {
+    const updates: UserUpdate = {};
+
+    if (bio !== user.bio) {
+      updates.bio = bio;
+    }
+
+    if (phoneNumber !== user.phone_number) {
+      updates.phone_number = phoneNumber;
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return;
+    }
+
+    try {
+      const req = await fetch("http://localhost:8000/users/profile/update", {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updates),
+      });
+
+      if (!req.ok) throw new Error(await req.text());
+
+      const data = await req.json();
+
+      return data;
+    } catch (errorResponse) {
+      setError(errorResponse as Error);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -156,6 +204,10 @@ export default function ProfileHeader({
     setOpenMetaDialog(false);
   };
 
+  // const handleUpdateProfile = () => {
+  //   setOpenProfile(true);
+  // };
+
   async function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const selected = e.target.files?.[0];
     if (!selected) return;
@@ -167,6 +219,29 @@ export default function ProfileHeader({
   }
 
   console.log("user", user);
+
+  const uploadUserImage = async () => {
+    console.log("uploading user photo");
+  };
+
+  const handleProfileClose = () => {
+    setOpenProfile(false);
+  };
+
+  const handleUserProfileSubmit = (e: React.FormEvent) => {
+    console.log("submit profile");
+
+    e.preventDefault();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setProfileFile(file);
+
+    setOpenProfile(true);
+  };
 
   if (error) {
     return (
@@ -241,6 +316,7 @@ export default function ProfileHeader({
               <Typography>{user.bio}</Typography>
             </Box>
           ) : null}
+          <Button onClick={() => setOpenProfile(true)}>Edit Profile</Button>
           <Box display="flex" alignItems="center" gap={1} sx={{ mt: 2 }}>
             <IconButton sx={{ color: "white" }} onClick={handlePrev}>
               ←
@@ -305,7 +381,7 @@ export default function ProfileHeader({
           </DialogContentText>
         </DialogContent>
         <form onSubmit={handleSubmit}>
-          <Stack sx={{m: 2}} spacing={2}>
+          <Stack sx={{ m: 2 }} spacing={2}>
             <TextField
               id="outlined-controlled"
               label="Name"
@@ -339,7 +415,7 @@ export default function ProfileHeader({
                 setGrade(parseInt(event.target.value));
               }}
               slotProps={{
-                htmlInput: { max: 5 }
+                htmlInput: { min: 0, max: 5 },
               }}
             />
             <TextField
@@ -353,9 +429,52 @@ export default function ProfileHeader({
           </Stack>
           <DialogActions>
             <Button type="submit">Submit</Button>
-            <Button>Cancel</Button>
+            <Button onClick={handleClose}>Cancel</Button>
           </DialogActions>
         </form>
+      </Dialog>
+      <Dialog open={openProfile} onClose={handleProfileClose}>
+        <DialogTitle>Edit Profile</DialogTitle>
+        <DialogContent>
+          <form onSubmit={(event) => handleUserProfileSubmit(event)}>
+            <Stack direction="row" sx={{ m: 2 }} spacing={2}>
+              <Avatar
+                id="profile_img"
+                src={user.url}
+                sx={{
+                  width: { xs: 48, sm: 56, md: 64, lg: 80 },
+                  height: { xs: 48, sm: 56, md: 64, lg: 80 },
+                }}
+              />
+              <Button variant="contained" component="label">
+                Upload Image
+                <input
+                  type="file"
+                  hidden
+                  accept="image/*"
+                  onChange={handleFileChange}
+                />
+              </Button>
+            </Stack>
+            <TextField
+              multiline
+              value={bio}
+              onChange={(event) => setUserBio(event.target.value)}
+              sx={{ m: 2 }}
+              placeholder="Update Bio"
+            />
+            <TextField
+              onChange={(event) => setPhoneNumber(event.target.value)}
+              value={phoneNumber}
+              sx={{ m: 2 }}
+              placeholder="Phone Number"
+            />
+          </form>
+        </DialogContent>
+        <DialogActions>
+          <Button type="submit">Submit</Button>
+          <Button onClick={handleProfileClose}>Cancel</Button>
+        </DialogActions>
       </Dialog>
     </>
   );
