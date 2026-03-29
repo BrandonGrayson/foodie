@@ -57,7 +57,6 @@ export default function ProfileHeader({
   followers,
   highlights,
 }: ProfileHeaderProps) {
-  // const [preview, setPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [openMetaDialog, setOpenMetaDialog] = useState(false);
   const [name, setName] = useState("");
@@ -69,9 +68,7 @@ export default function ProfileHeader({
   const [error, setError] = useState<Error | null>(null);
   const [page, setPage] = useState(0);
   const [openProfile, setOpenProfile] = useState(false);
-  // const [bio, setUserBio] = useState("");
   const [profileFile, setProfileFile] = useState<File | null>(null);
-  // const [phoneNumber, setPhoneNumber] = useState(user.phone_number);
   const PAGE_SIZE = 6;
   const [userProfile, setUserProfile] = useState<User>(user);
   const [originalUser, setOriginalUser] = useState(user);
@@ -187,41 +184,6 @@ export default function ProfileHeader({
     return res.json();
   };
 
-  // const uploadUserData = async () => {
-  //   const updates: UserUpdate = {};
-
-  //   if (userProfile.bio !== user.bio) {
-  //     updates.bio = userProfile.bio;
-  //   }
-
-  //   if (userProfile.phone_number !== user.phone_number) {
-  //     updates.phone_number = userProfile.phone_number;
-  //   }
-
-  //   if (Object.keys(updates).length === 0) {
-  //     return;
-  //   }
-
-  //   try {
-  //     const req = await fetch("http://localhost:8000/users/profile/update", {
-  //       method: "PATCH",
-  //       credentials: "include",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(updates),
-  //     });
-
-  //     if (!req.ok) throw new Error(await req.text());
-
-  //     const data = await req.json();
-
-  //     return data;
-  //   } catch (errorResponse) {
-  //     setError(errorResponse as Error);
-  //   }
-  // };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -236,10 +198,6 @@ export default function ProfileHeader({
     setOpenMetaDialog(false);
   };
 
-  // const handleUpdateProfile = () => {
-  //   setOpenProfile(true);
-  // };
-
   async function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const selected = e.target.files?.[0];
     if (!selected) return;
@@ -251,31 +209,6 @@ export default function ProfileHeader({
   }
 
   console.log("user", user);
-
-  // const uploadUserImage = async (file: File) => {
-  //   if (!file) return;
-
-  //   const formData = new FormData();
-  //   formData.append("file", file);
-
-  //   try {
-  //     const req = await fetch("http://localhost:8000/users/profile/image", {
-  //       method: "POST",
-  //       credentials: "include", // 👈 important if using auth cookies
-  //       body: formData,
-  //     });
-
-  //     if (!req.ok) {
-  //       const err = await req.text();
-  //       throw new Error(err);
-  //     }
-
-  //     const data = await req.json();
-  //     return data;
-  //   } catch (errorResponse) {
-  //     setError(errorResponse as Error);
-  //   }
-  // };
 
   const handleProfileClose = () => {
     setOpenProfile(false);
@@ -289,7 +222,6 @@ export default function ProfileHeader({
 
       if (!updatedUser) return;
 
-      // ✅ Single source of truth
       setUserProfile(updatedUser);
       setOriginalUser(updatedUser);
 
