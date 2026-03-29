@@ -20,7 +20,7 @@ import IconButton from "@mui/material/IconButton";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import Link from "next/link";
 import { useUI } from "../providers/providers";
-import { FoodItem, UserUpdate } from "../schemas/schemas";
+import { FoodItem } from "../schemas/schemas";
 
 interface User {
   created_at: string;

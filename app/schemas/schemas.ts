@@ -10,8 +10,3 @@ export interface FoodItem {
   user_id: number;
   created_at: string;
 }
-
-export interface UserUpdate {
-  phone_number?: string;
-  bio?: string
-}
