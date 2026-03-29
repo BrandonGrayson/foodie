@@ -31,6 +31,7 @@ interface User {
   url: string;
   bio: string | null;
   phone_number: string;
+  profile_image_key?: string;
 }
 
 interface Following {
@@ -68,18 +69,17 @@ export default function ProfileHeader({
   const [error, setError] = useState<Error | null>(null);
   const [page, setPage] = useState(0);
   const [openProfile, setOpenProfile] = useState(false);
-  const [bio, setUserBio] = useState("");
+  // const [bio, setUserBio] = useState("");
   const [profileFile, setProfileFile] = useState<File | null>(null);
-  const [phoneNumber, setPhoneNumber] = useState(user.phone_number);
+  // const [phoneNumber, setPhoneNumber] = useState(user.phone_number);
   const PAGE_SIZE = 6;
+  const [userProfile, setUserProfile] = useState<User>(user);
+  const [originalUser, setOriginalUser] = useState(user);
 
   useEffect(() => {
-    if (!user.bio) {
-      setUserBio("");
-    } else if (user.bio) {
-      setUserBio(user.bio);
-    }
-  }, []);
+    setUserProfile(user);
+    setOriginalUser(user);
+  }, [user]);
 
   const totalPages = Math.ceil(highlights.length / PAGE_SIZE);
 
@@ -155,40 +155,72 @@ export default function ProfileHeader({
     }
   };
 
-  const uploadUserData = async () => {
-    const updates: UserUpdate = {};
+  const updateUserProfile = async () => {
+    const formData = new FormData();
 
-    if (bio !== user.bio) {
-      updates.bio = bio;
+    // Only append changed fields
+    if (userProfile.bio !== originalUser.bio) {
+      formData.append("bio", userProfile.bio ?? "");
     }
 
-    if (phoneNumber !== user.phone_number) {
-      updates.phone_number = phoneNumber;
+    if (userProfile.phone_number !== originalUser.phone_number) {
+      formData.append("phone_number", userProfile.phone_number ?? "");
     }
 
-    if (Object.keys(updates).length === 0) {
-      return;
+    if (profileFile) {
+      formData.append("file", profileFile);
     }
 
-    try {
-      const req = await fetch("http://localhost:8000/users/profile/update", {
-        method: "PATCH",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updates),
-      });
+    // Nothing changed → exit early
+    if ([...formData.entries()].length === 0) return;
 
-      if (!req.ok) throw new Error(await req.text());
+    const res = await fetch("http://localhost:8000/users/profile", {
+      method: "PATCH",
+      credentials: "include",
+      body: formData,
+    });
 
-      const data = await req.json();
-
-      return data;
-    } catch (errorResponse) {
-      setError(errorResponse as Error);
+    if (!res.ok) {
+      throw new Error(await res.text());
     }
+
+    return res.json();
   };
+
+  // const uploadUserData = async () => {
+  //   const updates: UserUpdate = {};
+
+  //   if (userProfile.bio !== user.bio) {
+  //     updates.bio = userProfile.bio;
+  //   }
+
+  //   if (userProfile.phone_number !== user.phone_number) {
+  //     updates.phone_number = userProfile.phone_number;
+  //   }
+
+  //   if (Object.keys(updates).length === 0) {
+  //     return;
+  //   }
+
+  //   try {
+  //     const req = await fetch("http://localhost:8000/users/profile/update", {
+  //       method: "PATCH",
+  //       credentials: "include",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(updates),
+  //     });
+
+  //     if (!req.ok) throw new Error(await req.text());
+
+  //     const data = await req.json();
+
+  //     return data;
+  //   } catch (errorResponse) {
+  //     setError(errorResponse as Error);
+  //   }
+  // };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -220,18 +252,52 @@ export default function ProfileHeader({
 
   console.log("user", user);
 
-  const uploadUserImage = async () => {
-    console.log("uploading user photo");
-  };
+  // const uploadUserImage = async (file: File) => {
+  //   if (!file) return;
+
+  //   const formData = new FormData();
+  //   formData.append("file", file);
+
+  //   try {
+  //     const req = await fetch("http://localhost:8000/users/profile/image", {
+  //       method: "POST",
+  //       credentials: "include", // 👈 important if using auth cookies
+  //       body: formData,
+  //     });
+
+  //     if (!req.ok) {
+  //       const err = await req.text();
+  //       throw new Error(err);
+  //     }
+
+  //     const data = await req.json();
+  //     return data;
+  //   } catch (errorResponse) {
+  //     setError(errorResponse as Error);
+  //   }
+  // };
 
   const handleProfileClose = () => {
     setOpenProfile(false);
   };
 
-  const handleUserProfileSubmit = (e: React.FormEvent) => {
-    console.log("submit profile");
-
+  const handleUserProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    try {
+      const updatedUser = await updateUserProfile();
+
+      if (!updatedUser) return;
+
+      // ✅ Single source of truth
+      setUserProfile(updatedUser);
+      setOriginalUser(updatedUser);
+
+      setProfileFile(null);
+      setOpenProfile(false);
+    } catch (error) {
+      setError(error as Error);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -458,23 +524,33 @@ export default function ProfileHeader({
             </Stack>
             <TextField
               multiline
-              value={bio}
-              onChange={(event) => setUserBio(event.target.value)}
+              value={userProfile.bio}
+              onChange={(event) =>
+                setUserProfile((prev) => ({
+                  ...prev,
+                  bio: event.target.value,
+                }))
+              }
               sx={{ m: 2 }}
               placeholder="Update Bio"
             />
             <TextField
-              onChange={(event) => setPhoneNumber(event.target.value)}
-              value={phoneNumber}
+              onChange={(event) =>
+                setUserProfile((prev) => ({
+                  ...prev,
+                  phone_number: event.target.value,
+                }))
+              }
+              value={userProfile.phone_number}
               sx={{ m: 2 }}
               placeholder="Phone Number"
             />
+            <DialogActions>
+              <Button type="submit">Submit</Button>
+              <Button onClick={handleProfileClose}>Cancel</Button>
+            </DialogActions>
           </form>
         </DialogContent>
-        <DialogActions>
-          <Button type="submit">Submit</Button>
-          <Button onClick={handleProfileClose}>Cancel</Button>
-        </DialogActions>
       </Dialog>
     </>
   );
