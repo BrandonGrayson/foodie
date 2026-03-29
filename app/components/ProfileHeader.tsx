@@ -249,6 +249,8 @@ export default function ProfileHeader({
     );
   }
 
+  console.log('user', user)
+
   return (
     <>
       <Grid
@@ -280,7 +282,7 @@ export default function ProfileHeader({
           >
             <Avatar
               id="profile_img"
-              src={user.url}
+              src={userProfile.url}
               sx={{
                 width: { xs: 48, sm: 56, md: 64, lg: 80 },
                 height: { xs: 48, sm: 56, md: 64, lg: 80 }, // fix typo (47 → 48)
@@ -308,12 +310,9 @@ export default function ProfileHeader({
                 </Stack>
               </Stack>
             </Box>
+            
           </Stack>
-          {user.bio ? (
-            <Box>
-              <Typography>{user.bio}</Typography>
-            </Box>
-          ) : null}
+
           <Button onClick={() => setOpenProfile(true)}>Edit Profile</Button>
           <Box display="flex" alignItems="center" gap={1} sx={{ mt: 2 }}>
             <IconButton sx={{ color: "white" }} onClick={handlePrev}>
@@ -438,7 +437,7 @@ export default function ProfileHeader({
             <Stack direction="row" sx={{ m: 2 }} spacing={2}>
               <Avatar
                 id="profile_img"
-                src={user.url}
+                src={userProfile.url ?? ''}
                 sx={{
                   width: { xs: 48, sm: 56, md: 64, lg: 80 },
                   height: { xs: 48, sm: 56, md: 64, lg: 80 },
@@ -454,9 +453,10 @@ export default function ProfileHeader({
                 />
               </Button>
             </Stack>
+            <Stack spacing={2}>
             <TextField
               multiline
-              value={userProfile.bio}
+              value={userProfile.bio ?? ''}
               onChange={(event) =>
                 setUserProfile((prev) => ({
                   ...prev,
@@ -477,6 +477,8 @@ export default function ProfileHeader({
               sx={{ m: 2 }}
               placeholder="Phone Number"
             />
+            </Stack>
+
             <DialogActions>
               <Button type="submit">Submit</Button>
               <Button onClick={handleProfileClose}>Cancel</Button>
