@@ -13,12 +13,15 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { useUI } from "../providers/providers";
 import { useState } from "react";
 import ProfileFoodDialog from "./ProfileFoodDialog";
+import BottomNav from "./BottomNav";
 
 export default function UserFoodList() {
   const [open, setOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const { foodList } = useUI();
+
+  console.log('foodList', foodList)
 
   const handleImageSelection = (index: number) => {
     setCurrentIndex(index);
@@ -58,13 +61,14 @@ export default function UserFoodList() {
                   sizes="(max-width: 600px) 33vw, 200px"
                   style={{ objectFit: "cover" }}
                   src={food.url}
+                  unoptimized
                 />
               </ButtonBase>
             </ImageListItem>
           ))}
         </ImageList>
       </Grid>
-      <Grid size={12}>
+      {/* <Grid size={12}>
         <Paper
           sx={{ position: "fixed", bottom: 0, left: 0, right: 0 }}
           elevation={3}
@@ -83,7 +87,7 @@ export default function UserFoodList() {
             />
           </BottomNavigation>
         </Paper>
-      </Grid>
+      </Grid> */}
       {foodList && (
         <ProfileFoodDialog
           open={open}

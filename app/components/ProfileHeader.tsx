@@ -12,7 +12,7 @@ import {
   Box,
   Alert,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Grid from "@mui/material/Grid";
 import Avatar from "@mui/material/Avatar";
 import AppsIcon from "@mui/icons-material/Apps";
@@ -21,6 +21,8 @@ import BookmarkIcon from "@mui/icons-material/Bookmark";
 import Link from "next/link";
 import { useUI } from "../providers/providers";
 import { FoodItem } from "../schemas/schemas";
+import ChecklistIcon from '@mui/icons-material/Checklist';
+import Timer10SelectIcon from '@mui/icons-material/Timer10Select';
 
 interface User {
   created_at: string;
@@ -49,6 +51,10 @@ interface ProfileHeaderProps {
   following: Following[];
   followers: Followers[];
   highlights: FoodItem[];
+  selectedFile: File | null;
+  openMetaDialog: boolean;
+  setOpenMetaDialog: React.Dispatch<React.SetStateAction<boolean>>;
+  // fileInputRef: HTMLInputElement | null;
 }
 
 export default function ProfileHeader({
@@ -56,9 +62,13 @@ export default function ProfileHeader({
   following,
   followers,
   highlights,
+  selectedFile,
+  openMetaDialog,
+  setOpenMetaDialog
+  // fileInputRef
 }: ProfileHeaderProps) {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [openMetaDialog, setOpenMetaDialog] = useState(false);
+  // const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  // const [openMetaDialog, setOpenMetaDialog] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
@@ -72,6 +82,7 @@ export default function ProfileHeader({
   const PAGE_SIZE = 6;
   const [userProfile, setUserProfile] = useState<User>(user);
   const [originalUser, setOriginalUser] = useState(user);
+  // const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     setUserProfile(user);
@@ -198,15 +209,15 @@ export default function ProfileHeader({
     setOpenMetaDialog(false);
   };
 
-  async function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const selected = e.target.files?.[0];
-    if (!selected) return;
+  // async function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+  //   const selected = e.target.files?.[0];
+  //   if (!selected) return;
 
-    setSelectedFile(selected);
-    // setPreview(URL.createObjectURL(selected));
+  //   setSelectedFile(selected);
+  //   // setPreview(URL.createObjectURL(selected));
 
-    setOpenMetaDialog(true);
-  }
+  //   setOpenMetaDialog(true);
+  // }
 
   console.log("user", user);
 
@@ -281,7 +292,7 @@ export default function ProfileHeader({
             alignItems="center" // 👈 vertically align avatar + text
           >
             <Avatar
-              id="profile_img"
+              id="profile_img" 
               src={userProfile.url}
               sx={{
                 width: { xs: 48, sm: 56, md: 64, lg: 80 },
@@ -339,19 +350,15 @@ export default function ProfileHeader({
           </Box>
         </Box>
       </Grid>
-      <Grid size={12}>
+      {/* <Grid size={12}>
         <input
           type="file"
           accept="image/*"
           hidden
-          id="upload-photo"
           onChange={handleChange}
+          ref={fileInputRef}
         />
-
-        {/* {preview && (
-          <Avatar src={preview} sx={{ width: 100, height: 100, mt: 2 }} />
-        )} */}
-      </Grid>
+      </Grid> */}
       <Grid size={12} sx={{ display: "flex", justifyContent: "center" }}>
         <Stack direction="row" spacing={10}>
           <Link href="/profile">
@@ -362,12 +369,12 @@ export default function ProfileHeader({
           <Link href="/profile/favorites">
             <BookmarkIcon sx={{ height: "4em", cursor: "pointer" }} />
           </Link>
-          {/* <Link href="/profile/recipes">
-            <BookmarkIcon sx={{ height: "4em", cursor: "pointer" }} />
+          <Link href="/profile/newItem">
+            <ChecklistIcon sx={{ height: "4em", cursor: "pointer" }} />
           </Link>
-          <Link href="/profile/tagged">
-            <BookmarkAddIcon sx={{ height: "4em", cursor: "pointer" }} />
-          </Link> */}
+          <Link href="/profile/topTen">
+            <Timer10SelectIcon sx={{ height: "4em", cursor: "pointer" }} />
+          </Link>
         </Stack>
       </Grid>
       <Dialog open={openMetaDialog} onClose={handleClose}>
