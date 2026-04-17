@@ -32,3 +32,11 @@ export interface Followers {
   following_id: number;
   follower_id: number;
 }
+
+export interface TryLater {
+  restaurant_name: string;
+  menu_item: string;
+  image_key: string;
+  visited: string;
+  url: string | null;
+}

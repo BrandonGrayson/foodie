@@ -121,8 +121,28 @@ export default async function ProfileLayout({
 
   const highlights = await getHighlights();
 
+  const getTryLater = async () => {
+    const req = await fetch("http://localhost:8000/newItem/totry/", {
+      method: "GET",
+      headers: {
+        Cookie: cookieHeader,
+      },
+      cache: "no-store",
+    });
+
+    if (!req.ok) {
+      return "There was an error fetching Highlighted Items";
+    }
+
+    const data = await req.json();
+
+    return data
+  }
+
+  const tryLaterItems = await getTryLater()
+
   return (
-    <ProfileProviders initialFoodList={foodItems} user={user}>
+    <ProfileProviders initialFoodList={foodItems} user={user} tryLater={tryLaterItems}>
       <div
         style={{ width: "100%", overflow: "hidden", boxSizing: "border-box" }}
       >

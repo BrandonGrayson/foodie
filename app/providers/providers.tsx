@@ -8,6 +8,7 @@ import {
   SetStateAction,
   ReactNode,
 } from "react";
+import { TryLater } from "../schemas/schemas";
 
 interface FoodItem {
   description: string;
@@ -29,7 +30,9 @@ interface User {
 interface UIContextType {
   foodList: FoodItem[];
   setFoodList: Dispatch<SetStateAction<FoodItem[]>>;
-  user: User
+  user: User;
+  setTryLater: Dispatch<SetStateAction<TryLater[]>>;
+  tryLaterItems: TryLater[]
 }
 
 const UIContext = createContext<UIContextType | null>(null);
@@ -47,16 +50,19 @@ export function useUI() {
 export default function ProfileProviders({
   children,
   initialFoodList,
-  user
+  user,
+  tryLater
 }: {
   children: ReactNode;
   initialFoodList: FoodItem[];
-  user: User
+  user: User;
+  tryLater: TryLater[]
 }) {
   const [foodList, setFoodList] = useState<FoodItem[]>(initialFoodList);
+  const [tryLaterItems, setTryLater] = useState<TryLater[]>(tryLater);
 
   return (
-    <UIContext.Provider value={{ foodList, setFoodList, user }}>
+    <UIContext.Provider value={{ foodList, setFoodList, user, setTryLater, tryLaterItems }}>
         {children}
     </UIContext.Provider>
   );
