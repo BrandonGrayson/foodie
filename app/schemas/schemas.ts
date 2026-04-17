@@ -11,6 +11,15 @@ export interface FoodItem {
   created_at: string;
 }
 
+export interface NewItems {
+    restaurant_name: string | null;
+    menu_item: string | null;
+    image_key: string;
+    user_id: number;
+    visited: boolean;
+    url: string;
+}
+
 export interface User {
   created_at: string;
   email: string;
