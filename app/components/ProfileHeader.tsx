@@ -199,7 +199,7 @@ export default function ProfileHeader({
     e.preventDefault();
 
     if (!selectedFile) return;
-    const uploaded = await uploadImage(selectedFile); // ✅ immediate upload
+    const uploaded = await uploadImage(selectedFile);
     const uploadFood = await uploadImageMetaData(uploaded.key);
 
     console.log("uploadFood", uploadFood);

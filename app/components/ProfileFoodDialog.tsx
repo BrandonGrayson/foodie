@@ -17,7 +17,6 @@ import {
   Rating,
   Divider,
 } from "@mui/material";
-
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
@@ -282,7 +281,7 @@ export default function ProfileFoodDialog({
   };
 
   const handleClose = () => {
-    console.log('handle close clicked')
+    console.log("handle close clicked");
     setOpen(false);
   };
 
@@ -362,7 +361,7 @@ export default function ProfileFoodDialog({
   const handleBookmarkedItem = async () => {
     try {
       const req = await fetch(
-        `http://localhost:8000/foods/${foodItem.id}/favorites`,
+        `http://localhost:8000/add/topten/{food_id}`,
         {
           method: "POST",
           credentials: "include",
@@ -484,7 +483,7 @@ export default function ProfileFoodDialog({
           <Box sx={{ pl: 2 }}>
             <Rating name="read-only" value={foodItem?.grade} readOnly />
           </Box> */}
-          <Stack sx={{pt: 2, pl: 2}} direction="column" spacing={1}>
+          <Stack sx={{ pt: 2, pl: 2 }} direction="column" spacing={1}>
             <DialogContentText>{foodItem?.name}</DialogContentText>
             <DialogContentText>{foodItem?.description}</DialogContentText>
             <DialogContentText>{foodItem?.location}</DialogContentText>

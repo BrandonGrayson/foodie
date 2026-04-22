@@ -2,7 +2,7 @@
 import {
   ImageList,
   ImageListItem,
-  Paper,
+  Dialog,
   BottomNavigation,
   BottomNavigationAction,
   ButtonBase,
@@ -20,8 +20,11 @@ interface FoodGridProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function FoodGrid({ foodList, setCurrentIndex, setOpen }: FoodGridProps) {
-
+export default function FoodGrid({
+  foodList,
+  setCurrentIndex,
+  setOpen,
+}: FoodGridProps) {
   const handleImageSelection = (index: number) => {
     setCurrentIndex(index);
     setOpen(true);
@@ -64,4 +67,3 @@ export default function FoodGrid({ foodList, setCurrentIndex, setOpen }: FoodGri
     </Grid>
   );
 }
-

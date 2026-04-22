@@ -54,6 +54,8 @@ export default function BottomNav({ fileInputRef, setUploadType}: BottomNavProps
             borderRadius: 2,
             boxShadow: 3,
             zIndex: 1300, // 👈 above everything
+            backgroundColor: 'black',
+            color: 'white'
           }}
         >
           {uploadArray.map((item) => (
