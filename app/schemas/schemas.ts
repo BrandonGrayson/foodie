@@ -49,3 +49,17 @@ export interface TryLater {
   visited: string;
   url: string | null;
 }
+
+export interface TopTen {
+    name: string
+    description: string
+    location: string
+    grade: number
+    type: string
+    image_key: string
+    user_id: number
+    rank: number
+    url: string
+    created_at: string
+}
+

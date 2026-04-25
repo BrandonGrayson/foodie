@@ -12,7 +12,7 @@ import {
   Box,
   Alert,
 } from "@mui/material";
-import { useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid";
 import Avatar from "@mui/material/Avatar";
 import AppsIcon from "@mui/icons-material/Apps";
@@ -21,8 +21,9 @@ import BookmarkIcon from "@mui/icons-material/Bookmark";
 import Link from "next/link";
 import { useUI } from "../providers/providers";
 import { FoodItem } from "../schemas/schemas";
-import ChecklistIcon from '@mui/icons-material/Checklist';
-import Timer10SelectIcon from '@mui/icons-material/Timer10Select';
+import ChecklistIcon from "@mui/icons-material/Checklist";
+import Timer10SelectIcon from "@mui/icons-material/Timer10Select";
+import SearchIcon from "@mui/icons-material/Search";
 
 interface User {
   created_at: string;
@@ -64,7 +65,7 @@ export default function ProfileHeader({
   highlights,
   selectedFile,
   openMetaDialog,
-  setOpenMetaDialog
+  setOpenMetaDialog,
   // fileInputRef
 }: ProfileHeaderProps) {
   // const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -260,7 +261,7 @@ export default function ProfileHeader({
     );
   }
 
-  console.log('user', user)
+  console.log("user", user);
 
   return (
     <>
@@ -292,7 +293,7 @@ export default function ProfileHeader({
             alignItems="center" // 👈 vertically align avatar + text
           >
             <Avatar
-              id="profile_img" 
+              id="profile_img"
               src={userProfile.url}
               sx={{
                 width: { xs: 48, sm: 56, md: 64, lg: 80 },
@@ -321,7 +322,6 @@ export default function ProfileHeader({
                 </Stack>
               </Stack>
             </Box>
-            
           </Stack>
 
           <Button onClick={() => setOpenProfile(true)}>Edit Profile</Button>
@@ -374,6 +374,9 @@ export default function ProfileHeader({
           </Link>
           <Link href="/profile/topTen">
             <Timer10SelectIcon sx={{ height: "4em", cursor: "pointer" }} />
+          </Link>
+          <Link href="/profile/search">
+            <SearchIcon sx={{ height: "4em", cursor: "pointer" }} />
           </Link>
         </Stack>
       </Grid>
@@ -444,7 +447,7 @@ export default function ProfileHeader({
             <Stack direction="row" sx={{ m: 2 }} spacing={2}>
               <Avatar
                 id="profile_img"
-                src={userProfile.url ?? ''}
+                src={userProfile.url ?? ""}
                 sx={{
                   width: { xs: 48, sm: 56, md: 64, lg: 80 },
                   height: { xs: 48, sm: 56, md: 64, lg: 80 },
@@ -461,29 +464,29 @@ export default function ProfileHeader({
               </Button>
             </Stack>
             <Stack spacing={2}>
-            <TextField
-              multiline
-              value={userProfile.bio ?? ''}
-              onChange={(event) =>
-                setUserProfile((prev) => ({
-                  ...prev,
-                  bio: event.target.value,
-                }))
-              }
-              sx={{ m: 2 }}
-              placeholder="Update Bio"
-            />
-            <TextField
-              onChange={(event) =>
-                setUserProfile((prev) => ({
-                  ...prev,
-                  phone_number: event.target.value,
-                }))
-              }
-              value={userProfile.phone_number}
-              sx={{ m: 2 }}
-              placeholder="Phone Number"
-            />
+              <TextField
+                multiline
+                value={userProfile.bio ?? ""}
+                onChange={(event) =>
+                  setUserProfile((prev) => ({
+                    ...prev,
+                    bio: event.target.value,
+                  }))
+                }
+                sx={{ m: 2 }}
+                placeholder="Update Bio"
+              />
+              <TextField
+                onChange={(event) =>
+                  setUserProfile((prev) => ({
+                    ...prev,
+                    phone_number: event.target.value,
+                  }))
+                }
+                value={userProfile.phone_number}
+                sx={{ m: 2 }}
+                placeholder="Phone Number"
+              />
             </Stack>
 
             <DialogActions>

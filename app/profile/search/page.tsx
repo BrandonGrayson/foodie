@@ -1,4 +1,4 @@
-import TopTenList from "@/app/components/TopTenList";
+import Search from "@/app/components/Search"
 import { cookies } from "next/headers";
 
 export default async function Page() {
@@ -7,7 +7,6 @@ export default async function Page() {
     .getAll()
     .map((cookie) => `${cookie.name}=${cookie.value}`)
     .join("; ");
-    
   const getTopTenItems = async () => {
     const req = await fetch("http://localhost:8000/rank/topten", {
       headers: {
@@ -17,8 +16,9 @@ export default async function Page() {
     });
 
     if (!req.ok) {
-      console.log("There was an error fetching Top Ten Items")
+      console.log("There was an error fetching Top Ten items")
       return []
+
     }
 
     const topTenItemsList = await req.json();
@@ -27,6 +27,10 @@ export default async function Page() {
   };
 
   const topTenItems = await getTopTenItems()
-
-  return <TopTenList topTenList={topTenItems} />;
+    return (
+        <Search topTenItems={topTenItems} />
+    )
 }
+
+
+
