@@ -12,7 +12,8 @@ import {
   TextField,
   Stack,
   DialogActions,
-  Button
+  Button,
+  Box
 } from "@mui/material";
 import { useUI } from "../providers/providers";
 

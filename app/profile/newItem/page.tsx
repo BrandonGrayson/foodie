@@ -31,6 +31,8 @@ export default async function NewItem() {
 
   console.log("newItems", newItems);
   return (
-    <NewItemsList newItems={newItems} />
+    <div style={{ marginBottom: "100px" }}>
+      <NewItemsList newItems={newItems} />
+    </div>
   );
 }

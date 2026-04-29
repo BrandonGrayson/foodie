@@ -8,7 +8,7 @@ import {
   SetStateAction,
   ReactNode,
 } from "react";
-import { TryLater } from "../schemas/schemas";
+import { TryLater, User } from "../schemas/schemas";
 
 interface FoodItem {
   description: string;
@@ -21,10 +21,6 @@ interface FoodItem {
   type: string;
   user_id: number;
   created_at: string;
-}
-
-interface User {
-  user_name: string
 }
 
 interface UIContextType {

@@ -29,10 +29,10 @@ import { TopTen } from "../schemas/schemas";
 import { FoodItem } from "../schemas/schemas";
 
 interface SearchProps {
-  topTenItems: TopTen[]
+  topTenItems: TopTen[];
 }
 
-export default function Search({topTenItems}: SearchProps) {
+export default function Search({ topTenItems }: SearchProps) {
   const { foodList } = useUI();
 
   const [search, setSearch] = useState("");
@@ -66,10 +66,10 @@ export default function Search({topTenItems}: SearchProps) {
 
   const handleAddTopTen = async () => {
     const new_rank = {
-      "new_rank": rank
+      new_rank: rank,
     };
 
-    console.log('new_rank', new_rank)
+    console.log("new_rank", new_rank);
     const food = selectedFood;
 
     if (!food) return;
@@ -84,8 +84,7 @@ export default function Search({topTenItems}: SearchProps) {
       if (!req.ok) return;
 
       const data = await req.json();
-
-      return data;
+      setOpen(false);
     } catch (err) {
       setError(err as Error);
     }
@@ -148,15 +147,14 @@ export default function Search({topTenItems}: SearchProps) {
           </Card>
         ))}
         <Dialog fullWidth onClose={handleClose} open={open}>
-          <DialogTitle>Edit Top Ten items</DialogTitle>
+          <DialogTitle>Edit Top Ten Items</DialogTitle>
 
           <DialogContent>
+            <Typography>Rank Item</Typography>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <IconButton onClick={decrement} disabled={rank === 1}>
                 <Remove />
-              </IconButton>
-
-              <Stack spacing={2} direction="row">
+              </IconButton>            
                 <TextField
                   value={rank}
                   sx={{ width: 80 }}
@@ -170,24 +168,25 @@ export default function Search({topTenItems}: SearchProps) {
                 <IconButton onClick={increment} disabled={rank === 10}>
                   <Add />
                 </IconButton>
-              </Stack>
-
               {/* <Button variant="contained">Add</Button> */}
             </Box>
           </DialogContent>
 
           <DialogContent>
             {topTenItems.length > 0 ? (
-              <FormGroup>
-                {topTenItems.map((item) => (
-                  <FormControlLabel
-                    key={item.image_key}
-                    disabled
-                    control={<Checkbox />}
-                    label={item.name}
-                  />
-                ))}
-              </FormGroup>
+              <div>
+                <Typography>Current Top Ten Items</Typography>
+                <FormGroup>
+                  {topTenItems.map((item) => (
+                    <FormControlLabel
+                      key={item.image_key}
+                      disabled
+                      control={<Checkbox />}
+                      label={item.name}
+                    />
+                  ))}
+                </FormGroup>
+              </div>
             ) : (
               <Typography>No Top Ten Items</Typography>
             )}

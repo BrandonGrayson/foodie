@@ -41,7 +41,7 @@ export default function BottomNav({ fileInputRef, setUploadType}: BottomNavProps
   };
 
   return (
-    <Grid size={12}>
+    <Grid size={12} m={2}>
       {openUploadTypeDialog && (
         <List
           sx={{
@@ -69,7 +69,7 @@ export default function BottomNav({ fileInputRef, setUploadType}: BottomNavProps
       )}
 
       <Paper
-        sx={{ position: "fixed", bottom: 0, left: 0, right: 0 }}
+        sx={{position: "fixed", bottom: 0, left: 0, right: 0}}
         elevation={3}
       >
         <BottomNavigation sx={{ width: "100%" }}>

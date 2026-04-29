@@ -3,7 +3,6 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 import ProfileProviders from "../providers/providers";
-// import BottomNav from "../components/BottomNav";
 import UploadProvider from "../components/UploadProvider";
 
 export default async function ProfileLayout({
@@ -146,7 +145,6 @@ export default async function ProfileLayout({
       <div
         style={{ width: "100%", overflow: "hidden", boxSizing: "border-box" }}
       >
-
         <UploadProvider
           user={user}
           followers={followers}
@@ -155,14 +153,6 @@ export default async function ProfileLayout({
         >
           {children}
           </UploadProvider>
-        {/* <ProfileHeader
-          user={user}
-          followers={followers}
-          following={following}
-          highlights={highlights}
-        />
-        {children}
-        <BottomNav /> */}
       </div>
     </ProfileProviders>
   );

@@ -1,4 +1,4 @@
-import Search from "@/app/components/Search"
+import Search from "@/app/components/Search";
 import { cookies } from "next/headers";
 
 export default async function Page() {
@@ -16,21 +16,19 @@ export default async function Page() {
     });
 
     if (!req.ok) {
-      console.log("There was an error fetching Top Ten items")
-      return []
-
+      console.log("There was an error fetching Top Ten items");
+      return [];
     }
 
     const topTenItemsList = await req.json();
 
-    return topTenItemsList
+    return topTenItemsList;
   };
 
-  const topTenItems = await getTopTenItems()
-    return (
-        <Search topTenItems={topTenItems} />
-    )
+  const topTenItems = await getTopTenItems();
+  return (
+    <div style={{ marginBottom: "100px" }}>
+      <Search topTenItems={topTenItems} />
+    </div>
+  );
 }
-
-
-

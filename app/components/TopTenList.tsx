@@ -41,7 +41,7 @@ const handleAddImage = (food: FoodItem) => {
 
 export default function TopTenList({ topTenList }: TopTenProps) {
   return (
-    <Grid size={12}>
+    <Grid size={12} >
       <Grid
         spacing={2}
         direction="row"

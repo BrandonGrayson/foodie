@@ -20,13 +20,11 @@ import {
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
-
+import DeleteIcon from "@mui/icons-material/Delete";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import CloseIcon from "@mui/icons-material/Close";
 import ModeCommentIcon from "@mui/icons-material/ModeComment";
-import ImageIcon from "@mui/icons-material/Image";
-
 import Image from "next/image";
 import { useSwipeable } from "react-swipeable";
 import { useUI } from "../providers/providers";
@@ -111,7 +109,7 @@ export default function ProfileFoodDialog({
   const comments = foodData.comments ?? [];
   const isLiked = foodData.liked ?? false;
   const isBookmarked = foodData.bookmarked ?? false;
-  const { user } = useUI();
+  const { user, setFoodList } = useUI();
 
   /* ---------------------------
      LOAD LIKES
@@ -360,13 +358,10 @@ export default function ProfileFoodDialog({
 
   const handleBookmarkedItem = async () => {
     try {
-      const req = await fetch(
-        `http://localhost:8000/add/topten/{food_id}`,
-        {
-          method: "POST",
-          credentials: "include",
-        },
-      );
+      const req = await fetch(`http://localhost:8000/add/topten/{food_id}`, {
+        method: "POST",
+        credentials: "include",
+      });
 
       if (!req.ok) return;
 
@@ -379,6 +374,25 @@ export default function ProfileFoodDialog({
           bookmarked: data.favorited,
         },
       }));
+    } catch (err) {
+      setError(err as Error);
+    }
+  };
+
+  const handleUserDelete = async () => {
+    try {
+      const req = await fetch(`http://localhost:8000/foods/${foodItem.id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!req.ok) return;
+
+      const data = await req.json();
+
+      setFoodList((prev) => prev.filter((food) => food.id !== data.id));
+
+      setOpen(false);
     } catch (err) {
       setError(err as Error);
     }
@@ -466,9 +480,14 @@ export default function ProfileFoodDialog({
           <Box>
             <ListItem>
               <ListItemAvatar>
-                <Avatar>
-                  <ImageIcon />
-                </Avatar>
+                <Avatar
+                  id="profile_img"
+                  src={user.url ?? ""}
+                  sx={{
+                    width: { xs: 48, sm: 56, md: 64, lg: 80 },
+                    height: { xs: 48, sm: 56, md: 64, lg: 80 },
+                  }}
+                />
               </ListItemAvatar>
               <ListItemText
                 sx={{ display: "flex", flexWrap: "wrap" }}
@@ -502,9 +521,14 @@ export default function ProfileFoodDialog({
               {comments.map((comment) => (
                 <ListItem key={comment.id}>
                   <ListItemAvatar>
-                    <Avatar>
-                      <ImageIcon />
-                    </Avatar>
+                    <Avatar
+                      id="profile_img"
+                      src={user.url ?? ""}
+                      sx={{
+                        width: { xs: 38, sm: 46, md: 54, lg: 70 },
+                        height: { xs: 38, sm: 46, md: 54, lg: 70 },
+                      }}
+                    />
                   </ListItemAvatar>
                   <ListItemText
                     sx={{ display: "flex", flexWrap: "wrap" }}
@@ -527,6 +551,10 @@ export default function ProfileFoodDialog({
 
               <IconButton onClick={handleBookmarkedItem}>
                 <BookmarkIcon color={isBookmarked ? "warning" : "inherit"} />
+              </IconButton>
+
+              <IconButton onClick={handleUserDelete}>
+                <DeleteIcon color={isLiked ? "error" : "inherit"} />
               </IconButton>
 
               {!isMobile && (

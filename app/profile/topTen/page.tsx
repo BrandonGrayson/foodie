@@ -7,7 +7,7 @@ export default async function Page() {
     .getAll()
     .map((cookie) => `${cookie.name}=${cookie.value}`)
     .join("; ");
-    
+
   const getTopTenItems = async () => {
     const req = await fetch("http://localhost:8000/rank/topten", {
       headers: {
@@ -17,16 +17,20 @@ export default async function Page() {
     });
 
     if (!req.ok) {
-      console.log("There was an error fetching Top Ten Items")
-      return []
+      console.log("There was an error fetching Top Ten Items");
+      return [];
     }
 
     const topTenItemsList = await req.json();
 
-    return topTenItemsList
+    return topTenItemsList;
   };
 
-  const topTenItems = await getTopTenItems()
+  const topTenItems = await getTopTenItems();
 
-  return <TopTenList topTenList={topTenItems} />;
+  return (
+    <div style={{ marginBottom: "100px" }}>
+      <TopTenList topTenList={topTenItems} />
+    </div>
+  );
 }
