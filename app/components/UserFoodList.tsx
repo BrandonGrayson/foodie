@@ -14,18 +14,42 @@ import { useUI } from "../providers/providers";
 import { useState } from "react";
 import ProfileFoodDialog from "./ProfileFoodDialog";
 import BottomNav from "./BottomNav";
+import { FoodItem } from "../schemas/schemas";
 
 export default function UserFoodList() {
   const [open, setOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const { foodList } = useUI();
+  const { foodList, setFoodList } = useUI();
 
-  console.log('foodList', foodList)
+  // const foodItem = foodList[currentIndex];
+
+  // console.log('foodList', foodList)
 
   const handleImageSelection = (index: number) => {
     setCurrentIndex(index);
     setOpen(true);
+  };
+
+    const handleUserDelete = async (foodItem: FoodItem) => {
+    try {
+      const req = await fetch(`http://localhost:8000/foods/${foodItem.id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!req.ok) return;
+
+      const data = await req.json();
+
+      setFoodList((prev) => prev.filter((food) => food.id !== data.id));
+
+      setOpen(false);
+    } catch (err) {
+      // setError(err as Error);
+
+      console.log('err', err)
+    }
   };
 
   return (
@@ -95,6 +119,7 @@ export default function UserFoodList() {
           foodList={foodList}
           currentIndex={currentIndex}
           setCurrentIndex={setCurrentIndex}
+          onDelete={handleUserDelete}
         />
       )}
     </Grid>

@@ -49,6 +49,7 @@ interface ProfileDialogProps {
   setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  onDelete: (food: FoodItem) => Promise<void>;
 }
 
 interface Comment {
@@ -84,6 +85,7 @@ export default function ProfileFoodDialog({
   setCurrentIndex,
   open,
   setOpen,
+  onDelete,
 }: ProfileDialogProps) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
@@ -384,24 +386,24 @@ export default function ProfileFoodDialog({
     }
   };
 
-  const handleUserDelete = async () => {
-    try {
-      const req = await fetch(`http://localhost:8000/foods/${foodItem.id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
+  // const handleUserDelete = async () => {
+  //   try {
+  //     const req = await fetch(`http://localhost:8000/foods/${foodItem.id}`, {
+  //       method: "DELETE",
+  //       credentials: "include",
+  //     });
 
-      if (!req.ok) return;
+  //     if (!req.ok) return;
 
-      const data = await req.json();
+  //     const data = await req.json();
 
-      setFoodList((prev) => prev.filter((food) => food.id !== data.id));
+  //     setFoodList((prev) => prev.filter((food) => food.id !== data.id));
 
-      setOpen(false);
-    } catch (err) {
-      setError(err as Error);
-    }
-  };
+  //     setOpen(false);
+  //   } catch (err) {
+  //     setError(err as Error);
+  //   }
+  // };
 
   /* ---------------------------
      RENDER GUARDS
@@ -511,7 +513,7 @@ export default function ProfileFoodDialog({
             <DialogContentText>{foodItem?.name}</DialogContentText>
             <DialogContentText>{foodItem?.description}</DialogContentText>
             <DialogContentText>{foodItem?.location}</DialogContentText>
-            <DialogContentText>{foodItem?.type}</DialogContentText>
+            {/* <DialogContentText>{foodItem?.type}</DialogContentText> */}
             <Rating name="read-only" value={foodItem?.grade} readOnly />
           </Stack>
 
@@ -568,7 +570,7 @@ export default function ProfileFoodDialog({
               </IconButton>
 
               {foodItem.user_id === user.id && (
-                <IconButton onClick={handleUserDelete}>
+                <IconButton onClick={() => onDelete(foodItem)}>
                   <DeleteIcon color={isLiked ? "error" : "inherit"} />
                 </IconButton>
               )}

@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import FavoritesList from "@/app/components/FavoritesList";
+import { FoodItem } from "@/app/schemas/schemas";
 
 export default async function UserFavorites() {
 
@@ -29,6 +30,9 @@ export default async function UserFavorites() {
 
   const favorites = await getUserFavorites()
   return (
-    <FavoritesList foodList={favorites} />
+    <div style={{ marginBottom: "100px" }}>
+      <FavoritesList foodList={favorites} />
+    </div>
+    
   )
 }
