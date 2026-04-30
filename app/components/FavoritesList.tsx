@@ -30,7 +30,7 @@ export default function FavoritesList({ foodList }: FavoritesListProps) {
 
   const handleUserDelete = async (foodItem: FoodItem) => {
     try {
-      const req = await fetch(`http://localhost:8000/foods/${foodItem.id}`, {
+      const req = await fetch(`http://localhost:8000/favorite/${foodItem.id}`, {
         method: "DELETE",
         credentials: "include",
       });
