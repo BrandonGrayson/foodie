@@ -57,6 +57,11 @@ interface Comment {
   user_id: number;
   text: string;
   created_at: string;
+  user: {
+    url: string;
+    user_name: string;
+    id: number;
+  };
 }
 
 interface Likes {
@@ -484,8 +489,8 @@ export default function ProfileFoodDialog({
                   id="profile_img"
                   src={user.url ?? ""}
                   sx={{
-                    width: { xs: 48, sm: 56, md: 64, lg: 80 },
-                    height: { xs: 48, sm: 56, md: 64, lg: 80 },
+                    width: { xs: 28, sm: 30, md: 42, lg: 48 },
+                    height: { xs: 28, sm: 30, md: 42, lg: 48 },
                   }}
                 />
               </ListItemAvatar>
@@ -523,17 +528,26 @@ export default function ProfileFoodDialog({
                   <ListItemAvatar>
                     <Avatar
                       id="profile_img"
-                      src={user.url ?? ""}
+                      src={comment.user.url ?? ""}
                       sx={{
-                        width: { xs: 38, sm: 46, md: 54, lg: 70 },
-                        height: { xs: 38, sm: 46, md: 54, lg: 70 },
+                        width: { xs: 28, sm: 30, md: 42, lg: 48 },
+                        height: { xs: 28, sm: 30, md: 42, lg: 48 },
                       }}
                     />
                   </ListItemAvatar>
                   <ListItemText
+                    primary={comment.user.user_name}
+                    secondary={comment.text}
+                    slotProps={{
+                      primary: {
+                        sx: { mb: 0.5 },
+                      },
+                    }}
+                  />
+                  {/* <ListItemText
                     sx={{ display: "flex", flexWrap: "wrap" }}
                     primary={comment.text}
-                  />
+                  /> */}
                 </ListItem>
               ))}
             </List>
@@ -553,9 +567,11 @@ export default function ProfileFoodDialog({
                 <BookmarkIcon color={isBookmarked ? "warning" : "inherit"} />
               </IconButton>
 
-              <IconButton onClick={handleUserDelete}>
-                <DeleteIcon color={isLiked ? "error" : "inherit"} />
-              </IconButton>
+              {foodItem.user_id === user.id && (
+                <IconButton onClick={handleUserDelete}>
+                  <DeleteIcon color={isLiked ? "error" : "inherit"} />
+                </IconButton>
+              )}
 
               {!isMobile && (
                 <>
