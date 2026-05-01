@@ -360,7 +360,12 @@ export default function ProfileHeader({
         />
       </Grid> */}
       <Grid size={12} sx={{ display: "flex", justifyContent: "center" }}>
-        <Stack direction="row" spacing={10}>
+        <Stack direction="row" spacing={{
+              xs: 4, // mobile
+              sm: 6,
+              md: 8,
+              lg: 10,
+        }}>
           <Link href="/profile">
             <AppsIcon
               sx={{ height: "4em", display: "flex", cursor: "pointer" }}

@@ -97,7 +97,7 @@ export default function Search({ topTenItems }: SearchProps) {
         <Box
           sx={{
             width: {
-              xs: "100%", // mobile
+              xs: "80%", // mobile
               sm: "80%",
               md: "60%",
               lg: "40%",
