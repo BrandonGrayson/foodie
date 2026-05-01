@@ -84,6 +84,7 @@ export default function Search({ topTenItems }: SearchProps) {
       if (!req.ok) return;
 
       const data = await req.json();
+
       setOpen(false);
     } catch (err) {
       setError(err as Error);
@@ -92,16 +93,33 @@ export default function Search({ topTenItems }: SearchProps) {
 
   return (
     <Grid size={12}>
-      <Box sx={{ width: "100%", display: "flex", justifyContent: "center" }}>
-        <TextField
-          value={search}
-          sx={{ backgroundColor: "white" }}
-          onChange={(e) => setSearch(e.target.value)}
-          id="outlined-basic"
-          label="Search Foods"
-          variant="outlined"
-        />
-      </Box>
+      <Grid size={12} sx={{ display: "flex", justifyContent: "center" }}>
+        <Box
+          sx={{
+            width: {
+              xs: "100%", // mobile
+              sm: "80%",
+              md: "60%",
+              lg: "40%",
+            },
+          }}
+        >
+          <TextField
+            value={search}
+            fullWidth
+            sx={{
+              backgroundColor: "white",
+              borderRadius: "50px", // outer wrapper (optional)
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "50px", // 🔥 this is what actually rounds it
+              },
+            }}
+            onChange={(e) => setSearch(e.target.value)}
+            id="outlined-basic"
+            variant="outlined"
+          />
+        </Box>
+      </Grid>
 
       <Grid
         spacing={2}
@@ -133,7 +151,6 @@ export default function Search({ topTenItems }: SearchProps) {
             <CardContent>
               <Stack spacing={2}>
                 <Typography>{food.name}</Typography>
-                <Typography>{food.type}</Typography>
                 <Typography>{food.description}</Typography>
                 <Typography>{food.location}</Typography>
                 <Rating name="read-only" value={food.grade} readOnly />
@@ -154,20 +171,20 @@ export default function Search({ topTenItems }: SearchProps) {
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <IconButton onClick={decrement} disabled={rank === 1}>
                 <Remove />
-              </IconButton>            
-                <TextField
-                  value={rank}
-                  sx={{ width: 80 }}
-                  slotProps={{
-                    htmlInput: {
-                      style: { textAlign: "center" },
-                      readOnly: true,
-                    },
-                  }}
-                />
-                <IconButton onClick={increment} disabled={rank === 10}>
-                  <Add />
-                </IconButton>
+              </IconButton>
+              <TextField
+                value={rank}
+                sx={{ width: 80 }}
+                slotProps={{
+                  htmlInput: {
+                    style: { textAlign: "center" },
+                    readOnly: true,
+                  },
+                }}
+              />
+              <IconButton onClick={increment} disabled={rank === 10}>
+                <Add />
+              </IconButton>
               {/* <Button variant="contained">Add</Button> */}
             </Box>
           </DialogContent>
