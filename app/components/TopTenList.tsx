@@ -11,14 +11,6 @@ import {
   Rating,
   Typography,
   Button,
-  Dialog,
-  DialogTitle,
-  IconButton,
-  FormGroup,
-  FormControlLabel,
-  Checkbox,
-  DialogContent,
-  DialogActions,
   CardHeader,
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
@@ -33,13 +25,31 @@ interface TopTenProps {
   topTenList: TopTen[];
 }
 
-const handleAddImage = (food: FoodItem) => {
-  console.log("hello");
-  // setOpen(true);
-  // setSelectedFood(food);
-};
+
 
 export default function TopTenList({ topTenList }: TopTenProps) {
+
+  const [topTen, setTopTen] = useState(topTenList)
+
+  const handleDelete = async (food: TopTen) => {
+  console.log("hello");
+      try {
+      const req = await fetch(`http://localhost:8000/remove/rank/topten/${food.food_id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!req.ok) return;
+
+      const data = await req.json();
+
+      setTopTen((prev) => prev.filter((food) => food.food_id !== data.food_id));
+
+    } catch (err) {
+      // setError(err as Error);
+      console.log('err', err)
+    }
+};
   return (
     <Grid size={12} >
       <Grid
@@ -50,7 +60,7 @@ export default function TopTenList({ topTenList }: TopTenProps) {
       >
         {topTenList.length > 0 ? (
           <>
-            {topTenList.map((food) => (
+            {topTen.map((food) => (
               <Card sx={{ maxWidth: 345, margin: 2 }} key={food.image_key}>
                 <CardHeader
                   avatar={
@@ -96,7 +106,7 @@ export default function TopTenList({ topTenList }: TopTenProps) {
                   </Stack>
                 </CardContent>
                 <CardActions>
-                  <Button size="small">Re Rank</Button>
+                  <Button onClick={() => handleDelete(food)} size="small">Delete</Button>
                 </CardActions>
               </Card>
             ))}

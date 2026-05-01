@@ -12,6 +12,7 @@ export interface FoodItem {
 }
 
 export interface NewItems {
+    id: number;
     restaurant_name: string | null;
     menu_item: string | null;
     image_key: string;
@@ -58,6 +59,7 @@ export interface TopTen {
     type: string
     image_key: string
     user_id: number
+    food_id: number
     rank: number
     url: string
     created_at: string

@@ -9,7 +9,7 @@ export default async function NewItem() {
     .join("; ");
 
   const getNewItems = async () => {
-    const req = await fetch("http://localhost:8000/newItem/totry/", {
+    const req = await fetch("http://localhost:8000/newItem/totry", {
       method: "GET",
       headers: {
         Cookie: cookieHeader,

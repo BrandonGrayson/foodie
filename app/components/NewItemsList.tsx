@@ -38,6 +38,26 @@ export default function NewItemsList({ newItems }: NewItemsListProps) {
     setOpen(false);
   };
 
+  const handleDelete = async () => {
+    try {
+      const req = await fetch(`http://localhost:8000/newItem/${tryItem.id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!req.ok) return;
+
+      const data = await req.json();
+
+      
+
+      setOpen(false);
+    } catch (err) {
+      // setError(err as Error);
+      console.log('error', err)
+    }
+  };
+
   return (
     <Grid size={12}>
       <ImageList sx={{ width: "100%" }} cols={3}>
@@ -102,7 +122,7 @@ export default function NewItemsList({ newItems }: NewItemsListProps) {
         </DialogContent>
 
         <DialogActions>
-          <Button>Visited</Button>
+          <Button onClick={handleDelete}>Remove</Button>
           <Button onClick={handleClose}>Cancel</Button>
         </DialogActions>
       </Dialog>
