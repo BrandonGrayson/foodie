@@ -43,7 +43,10 @@ export default function TopTenList({ topTenList }: TopTenProps) {
 
       const data = await req.json();
 
-      setTopTen((prev) => prev.filter((food) => food.food_id !== data.food_id));
+      console.log('top ten delete data', data)
+
+      // setTopTen((prev) => prev.filter((food) => food.food_id !== data.food_id));
+      setTopTen(data)
 
     } catch (err) {
       // setError(err as Error);
