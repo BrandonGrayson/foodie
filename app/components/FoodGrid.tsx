@@ -2,7 +2,7 @@
 import {
   ImageList,
   ImageListItem,
-  Dialog,
+  Box,
   BottomNavigation,
   BottomNavigationAction,
   ButtonBase,
@@ -32,38 +32,50 @@ export default function FoodGrid({
 
   return (
     <Grid size={12}>
-      <ImageList sx={{ width: "100%" }} cols={3}>
-        {foodList.map((food, index) => (
-          <ImageListItem
-            key={food.image_key}
-            onClick={() => handleImageSelection(index)}
-            sx={{
-              position: "relative",
-              aspectRatio: "1 / 1",
-              overflow: "hidden",
-            }}
-          >
-            <ButtonBase
+      {/* <Box
+        sx={{
+          width: {
+            xs: "100%", // full width on mobile
+            sm: "90%",
+            md: "75%", // shrink on tablet
+            lg: "60%", // smaller on laptop
+          },
+          margin: "0 auto", // center it
+        }}
+      > */}
+        <ImageList cols={3}>
+          {foodList.map((food, index) => (
+            <ImageListItem
+              key={food.image_key}
+              onClick={() => handleImageSelection(index)}
               sx={{
-                width: "100%",
-                height: "100%",
                 position: "relative",
                 aspectRatio: "1 / 1",
                 overflow: "hidden",
-                borderRadius: 1,
               }}
             >
-              <Image
-                alt="user favorites"
-                fill
-                sizes="(max-width: 600px) 33vw, 200px"
-                style={{ objectFit: "cover" }}
-                src={food.url}
-              />
-            </ButtonBase>
-          </ImageListItem>
-        ))}
-      </ImageList>
+              <ButtonBase
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  position: "relative",
+                  aspectRatio: "1 / 1",
+                  overflow: "hidden",
+                  borderRadius: 1,
+                }}
+              >
+                <Image
+                  alt="user favorites"
+                  fill
+                  sizes="(max-width: 600px) 33vw, 200px"
+                  style={{ objectFit: "cover" }}
+                  src={food.url}
+                />
+              </ButtonBase>
+            </ImageListItem>
+          ))}
+        </ImageList>
+      {/* </Box> */}
     </Grid>
   );
 }

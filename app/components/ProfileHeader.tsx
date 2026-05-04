@@ -207,18 +207,14 @@ export default function ProfileHeader({
 
     setFoodList((prev) => [uploadFood, ...prev]);
 
+    setName("")
+    setDescription("")
+    setType("")
+    setGrade(0)
+    setLocation("")
+
     setOpenMetaDialog(false);
   };
-
-  // async function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-  //   const selected = e.target.files?.[0];
-  //   if (!selected) return;
-
-  //   setSelectedFile(selected);
-  //   // setPreview(URL.createObjectURL(selected));
-
-  //   setOpenMetaDialog(true);
-  // }
 
   console.log("user", user);
 
@@ -360,12 +356,15 @@ export default function ProfileHeader({
         />
       </Grid> */}
       <Grid size={12} sx={{ display: "flex", justifyContent: "center" }}>
-        <Stack direction="row" spacing={{
-              xs: 4, // mobile
-              sm: 6,
-              md: 8,
-              lg: 10,
-        }}>
+        <Stack
+          direction="row"
+          spacing={{
+            xs: 4, // mobile
+            sm: 6,
+            md: 8,
+            lg: 10,
+          }}
+        >
           <Link href="/profile">
             <AppsIcon
               sx={{ height: "4em", display: "flex", cursor: "pointer" }}
@@ -396,10 +395,18 @@ export default function ProfileHeader({
           <Stack sx={{ m: 2 }} spacing={2}>
             <TextField
               id="outlined-controlled"
-              label="Name"
+              label="Restaurant Name"
               value={name}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 setName(event.target.value);
+              }}
+            />
+            <TextField
+              id="outlined-controlled"
+              label="Menu Item Description"
+              value={description}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setDescription(event.target.value);
               }}
             />
             <TextField
@@ -408,14 +415,6 @@ export default function ProfileHeader({
               value={type}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 setType(event.target.value);
-              }}
-            />
-            <TextField
-              id="outlined-controlled"
-              label="Description"
-              value={description}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                setDescription(event.target.value);
               }}
             />
             <TextField

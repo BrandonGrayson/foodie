@@ -28,6 +28,7 @@ export default function NewItemsList({ newItems }: NewItemsListProps) {
   const [open, setOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const tryItem = newItems[currentIndex];
+  const [newItemsList, setNewItems] = useState(newItems)
 
   const handleImageSelection = (index: number) => {
     setCurrentIndex(index);
@@ -48,8 +49,7 @@ export default function NewItemsList({ newItems }: NewItemsListProps) {
       if (!req.ok) return;
 
       const data = await req.json();
-
-      
+      setNewItems((prev) => prev.filter((food) => food.id !== data.id))
 
       setOpen(false);
     } catch (err) {
@@ -61,7 +61,7 @@ export default function NewItemsList({ newItems }: NewItemsListProps) {
   return (
     <Grid size={12}>
       <ImageList sx={{ width: "100%" }} cols={3}>
-        {newItems.map((item, index) => (
+        {newItemsList.map((item, index) => (
           <ImageListItem
             key={item.image_key}
             onClick={() => handleImageSelection(index)}

@@ -365,7 +365,7 @@ export default function ProfileFoodDialog({
 
   const handleBookmarkedItem = async () => {
     try {
-      const req = await fetch(`http://localhost:8000/add/topten/{food_id}`, {
+      const req = await fetch(`http://localhost:8000/foods/${foodItem.id}/favorites`, {
         method: "POST",
         credentials: "include",
       });
@@ -571,7 +571,7 @@ export default function ProfileFoodDialog({
 
               {foodItem.user_id === user.id && (
                 <IconButton onClick={() => onDelete(foodItem)}>
-                  <DeleteIcon color={isLiked ? "error" : "inherit"} />
+                  <DeleteIcon  />
                 </IconButton>
               )}
 

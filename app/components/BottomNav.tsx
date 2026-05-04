@@ -10,24 +10,26 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import SettingsIcon from "@mui/icons-material/Settings";
 import { useState } from "react";
 import { RefObject } from "react";
+import HomeIcon from "@mui/icons-material/Home";
+import { useRouter } from "next/navigation";
 
 interface BottomNavProps {
   fileInputRef: RefObject<HTMLInputElement | null>;
-  // selectedFile: File | null;
-  // setSelectedFile: React.Dispatch<React.SetStateAction<File | null>>;
-
-  // openMetaDialog: boolean;
   setUploadType: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export default function BottomNav({ fileInputRef, setUploadType}: BottomNavProps) {
+export default function BottomNav({
+  fileInputRef,
+  setUploadType,
+}: BottomNavProps) {
   const [openUploadTypeDialog, setOpenUploadTypeDialog] = useState(false);
-  // const [uploadArray, setUploadArray] = useState(["Post", "Try Later"])
+  const router = useRouter();
 
   const uploadArray = ["Post", "Try Later"];
-  // const [uploadType, setUploadType] = useState("");
 
   const handleListItemClick = (item: string) => {
     setUploadType(item);
@@ -54,8 +56,8 @@ export default function BottomNav({ fileInputRef, setUploadType}: BottomNavProps
             borderRadius: 2,
             boxShadow: 3,
             zIndex: 1300, // 👈 above everything
-            backgroundColor: 'black',
-            color: 'white'
+            backgroundColor: "black",
+            color: "white",
           }}
         >
           {uploadArray.map((item) => (
@@ -69,14 +71,29 @@ export default function BottomNav({ fileInputRef, setUploadType}: BottomNavProps
       )}
 
       <Paper
-        sx={{position: "fixed", bottom: 0, left: 0, right: 0}}
+        sx={{ position: "fixed", bottom: 0, left: 0, right: 0 }}
         elevation={3}
       >
         <BottomNavigation sx={{ width: "100%" }}>
           <BottomNavigationAction
             value="add"
+            icon={<HomeIcon fontSize="large" />}
+            onClick={() => router.push("/feed")}
+          />
+          <BottomNavigationAction
+            value="add"
             icon={<AddCircleOutlineIcon fontSize="large" />}
             onClick={() => setOpenUploadTypeDialog(true)}
+          />
+          <BottomNavigationAction
+            value="add"
+            icon={<AccountCircleIcon fontSize="large" />}
+            onClick={() => router.push("/profile")}
+          />
+          <BottomNavigationAction
+            value="add"
+            icon={<SettingsIcon fontSize="large" />}
+            onClick={() => router.push("/profile")}
           />
         </BottomNavigation>
       </Paper>

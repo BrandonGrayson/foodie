@@ -151,12 +151,10 @@ export default function UploadProvider({
       />
       <input type="file" hidden ref={fileInputRef} onChange={handleChange} />
       <Dialog open={openTryLaterMetaDialog} onClose={handleClose}>
-        <DialogTitle>Try Later</DialogTitle>
+        <DialogTitle>What is it that you want to try?</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            What is it that you want to try later
-          </DialogContentText>
           <form onSubmit={handleSubmit}>
+            <Stack spacing={2}>
             <TextField
               id="outlined-controlled"
               label="Restaurant Name"
@@ -173,7 +171,10 @@ export default function UploadProvider({
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 setMenuItem(event.target.value);
               }}
-            />
+               />
+            </Stack>
+
+           
             <Stack sx={{ m: 2 }} spacing={2}>
               <DialogActions>
                 <Button type="submit">Submit</Button>
