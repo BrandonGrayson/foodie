@@ -88,7 +88,7 @@ export default function BottomNav({
           <BottomNavigationAction
             value="add"
             icon={<AccountCircleIcon fontSize="large" />}
-            onClick={() => router.push("/profile")}
+            onClick={() => router.push("/users")}
           />
           <BottomNavigationAction
             value="add"

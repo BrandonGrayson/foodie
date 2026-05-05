@@ -138,7 +138,7 @@ export default function UploadProvider({
         user={user}
         followers={followers}
         following={following}
-        highlights={highlights}
+        // highlights={highlights}
         setOpenMetaDialog={setOpenMetaDialog}
         selectedFile={selectedFile}
         openMetaDialog={openMetaDialog}

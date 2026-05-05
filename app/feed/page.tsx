@@ -1,6 +1,5 @@
 import { cookies } from "next/headers";
 import UserFeed from "../components/UserFeed";
-import BottomNav from "../components/BottomNav";
 
 export default async function Page() {
   const cookieStore = await cookies();
@@ -32,7 +31,6 @@ export default async function Page() {
     <>
       
       <UserFeed feed={feedItems} />
-      {/* <BottomNav /> */}
     </>
   );
 }

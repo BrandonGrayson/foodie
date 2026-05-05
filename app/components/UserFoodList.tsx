@@ -2,18 +2,13 @@
 import {
   ImageList,
   ImageListItem,
-  Paper,
-  BottomNavigation,
-  BottomNavigationAction,
   ButtonBase,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Image from "next/image";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { useUI } from "../providers/providers";
 import { useState } from "react";
 import ProfileFoodDialog from "./ProfileFoodDialog";
-import BottomNav from "./BottomNav";
 import { FoodItem } from "../schemas/schemas";
 
 export default function UserFoodList() {
