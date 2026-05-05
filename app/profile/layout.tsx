@@ -141,7 +141,7 @@ export default async function ProfileLayout({
   const tryLaterItems = await getTryLater()
 
   return (
-    <ProfileProviders initialFoodList={foodItems} user={user} tryLater={tryLaterItems}>
+    <ProfileProviders initialFoodList={foodItems} user={user} tryLater={tryLaterItems} highlighedItems={highlights}>
       <div
         style={{ width: "100%", overflow: "hidden", boxSizing: "border-box" }}
       >

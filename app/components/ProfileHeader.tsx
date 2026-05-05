@@ -51,7 +51,7 @@ interface ProfileHeaderProps {
   user: User;
   following: Following[];
   followers: Followers[];
-  highlights: FoodItem[];
+  // highlights: FoodItem[];
   selectedFile: File | null;
   openMetaDialog: boolean;
   setOpenMetaDialog: React.Dispatch<React.SetStateAction<boolean>>;
@@ -62,7 +62,7 @@ export default function ProfileHeader({
   user,
   following,
   followers,
-  highlights,
+  // highlights,
   selectedFile,
   openMetaDialog,
   setOpenMetaDialog,
@@ -84,6 +84,8 @@ export default function ProfileHeader({
   const [userProfile, setUserProfile] = useState<User>(user);
   const [originalUser, setOriginalUser] = useState(user);
   // const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const {highlights} = useUI()
 
   useEffect(() => {
     setUserProfile(user);
@@ -215,8 +217,6 @@ export default function ProfileHeader({
 
     setOpenMetaDialog(false);
   };
-
-  console.log("user", user);
 
   const handleProfileClose = () => {
     setOpenProfile(false);

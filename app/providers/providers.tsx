@@ -29,6 +29,8 @@ interface UIContextType {
   user: User;
   setTryLater: Dispatch<SetStateAction<TryLater[]>>;
   tryLaterItems: TryLater[]
+  highlights: FoodItem[];
+  setHighlights: Dispatch<SetStateAction<FoodItem[]>>;
 }
 
 const UIContext = createContext<UIContextType | null>(null);
@@ -47,18 +49,21 @@ export default function ProfileProviders({
   children,
   initialFoodList,
   user,
-  tryLater
+  tryLater,
+  highlighedItems
 }: {
   children: ReactNode;
   initialFoodList: FoodItem[];
   user: User;
-  tryLater: TryLater[]
+  tryLater: TryLater[];
+  highlighedItems: FoodItem[];
 }) {
   const [foodList, setFoodList] = useState<FoodItem[]>(initialFoodList);
   const [tryLaterItems, setTryLater] = useState<TryLater[]>(tryLater);
+  const [highlights, setHighlights] = useState(highlighedItems)
 
   return (
-    <UIContext.Provider value={{ foodList, setFoodList, user, setTryLater, tryLaterItems }}>
+    <UIContext.Provider value={{ foodList, setFoodList, user, setTryLater, tryLaterItems, highlights, setHighlights }}>
         {children}
     </UIContext.Provider>
   );

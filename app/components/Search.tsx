@@ -33,7 +33,7 @@ interface SearchProps {
 }
 
 export default function Search({ topTenItems }: SearchProps) {
-  const { foodList } = useUI();
+  const { foodList, setHighlights } = useUI();
 
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
@@ -84,6 +84,28 @@ export default function Search({ topTenItems }: SearchProps) {
       if (!req.ok) return;
 
       const data = await req.json();
+
+      setOpen(false);
+    } catch (err) {
+      setError(err as Error);
+    }
+  };
+
+  const handleAddHighlight = async (food: FoodItem) => {
+    try {
+      const req = await fetch(`http://localhost:8000/profile/highlights/${food.id}`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!req.ok) return;
+
+      const data = await req.json();
+
+      console.log('hightlight data', data)
+
+      setHighlights(data)
 
       setOpen(false);
     } catch (err) {
@@ -158,7 +180,10 @@ export default function Search({ topTenItems }: SearchProps) {
             </CardContent>
             <CardActions>
               <Button onClick={() => handleAddImage(food)} size="small">
-                Add
+                Top Ten
+              </Button>
+              <Button onClick={() => handleAddHighlight(food)} size="small">
+                Highlight
               </Button>
             </CardActions>
           </Card>
