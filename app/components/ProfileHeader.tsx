@@ -24,6 +24,7 @@ import { FoodItem } from "../schemas/schemas";
 import ChecklistIcon from "@mui/icons-material/Checklist";
 import Timer10SelectIcon from "@mui/icons-material/Timer10Select";
 import SearchIcon from "@mui/icons-material/Search";
+import ProfileFoodDialog from "./ProfileFoodDialog";
 
 interface User {
   created_at: string;
@@ -83,9 +84,11 @@ export default function ProfileHeader({
   const PAGE_SIZE = 6;
   const [userProfile, setUserProfile] = useState<User>(user);
   const [originalUser, setOriginalUser] = useState(user);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [open, setOpen] = useState(false);
   // const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const {highlights} = useUI()
+  const { highlights, setHighlights } = useUI();
 
   useEffect(() => {
     setUserProfile(user);
@@ -209,11 +212,11 @@ export default function ProfileHeader({
 
     setFoodList((prev) => [uploadFood, ...prev]);
 
-    setName("")
-    setDescription("")
-    setType("")
-    setGrade(0)
-    setLocation("")
+    setName("");
+    setDescription("");
+    setType("");
+    setGrade(0);
+    setLocation("");
 
     setOpenMetaDialog(false);
   };
@@ -248,6 +251,31 @@ export default function ProfileHeader({
 
     setOpenProfile(true);
   };
+
+  const handleHighlightDelete = async (foodItem: FoodItem) => {
+    try {
+      const req = await fetch(`http://localhost:8000/profile/highlights/${foodItem.id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!req.ok) return;
+
+      const data = await req.json();
+
+      setHighlights((prev) => prev.filter((food) => food.id !== data.food_id));
+
+      setOpen(false);
+    } catch (err) {
+      // setError(err as Error);
+      console.log("error", err);
+    }
+  };
+
+  const handleHighlightedItem = (index: number) => {
+    setCurrentIndex(index)
+    setOpen(true)
+  }
 
   if (error) {
     return (
@@ -327,10 +355,11 @@ export default function ProfileHeader({
             </IconButton>
 
             <Box display="flex" gap={1}>
-              {visibleFoods.map((food) => (
+              {visibleFoods.map((food, index) => (
                 <Avatar
                   key={food.id}
                   src={food.url}
+                  onClick={() => handleHighlightedItem(index)}
                   sx={{
                     width: { xs: 40, sm: 48, md: 56 },
                     height: { xs: 40, sm: 48, md: 56 },
@@ -500,6 +529,14 @@ export default function ProfileHeader({
           </form>
         </DialogContent>
       </Dialog>
+      <ProfileFoodDialog
+        foodList={highlights}
+        currentIndex={currentIndex}
+        setCurrentIndex={setCurrentIndex}
+        open={open}
+        setOpen={setOpen}
+        onDelete={handleHighlightDelete}
+      />
     </>
   );
 }
