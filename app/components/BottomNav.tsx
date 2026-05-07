@@ -16,6 +16,7 @@ import { useState } from "react";
 import { RefObject } from "react";
 import HomeIcon from "@mui/icons-material/Home";
 import { useRouter } from "next/navigation";
+import SearchIcon from "@mui/icons-material/Search";
 
 interface BottomNavProps {
   fileInputRef: RefObject<HTMLInputElement | null>;
@@ -87,8 +88,13 @@ export default function BottomNav({
           />
           <BottomNavigationAction
             value="add"
-            icon={<AccountCircleIcon fontSize="large" />}
+            icon={<SearchIcon fontSize="large" />}
             onClick={() => router.push("/users")}
+          />
+          <BottomNavigationAction
+            value="add"
+            icon={<AccountCircleIcon fontSize="large" />}
+            onClick={() => router.push("/profile")}
           />
           <BottomNavigationAction
             value="add"

@@ -386,25 +386,6 @@ export default function ProfileFoodDialog({
     }
   };
 
-  // const handleUserDelete = async () => {
-  //   try {
-  //     const req = await fetch(`http://localhost:8000/foods/${foodItem.id}`, {
-  //       method: "DELETE",
-  //       credentials: "include",
-  //     });
-
-  //     if (!req.ok) return;
-
-  //     const data = await req.json();
-
-  //     setFoodList((prev) => prev.filter((food) => food.id !== data.id));
-
-  //     setOpen(false);
-  //   } catch (err) {
-  //     setError(err as Error);
-  //   }
-  // };
-
   /* ---------------------------
      RENDER GUARDS
   --------------------------- */
