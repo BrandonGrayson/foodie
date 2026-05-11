@@ -1,22 +1,26 @@
-// import ProfileHeader from "../components/ProfileHeader";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
-import ProfileProviders from "../providers/providers";
-import UploadProvider from "../components/UploadProvider";
+import ProfileProviders from "../../providers/providers";
+import UploadProvider from "../../components/UploadProvider";
+
+interface ProfileLayoutProps {
+  children: ReactNode,
+  params: Promise<{ username: string }>;
+}
 
 export default async function ProfileLayout({
   children,
-}: {
-  children: ReactNode;
-}) {
+  params
+}: ProfileLayoutProps) {
+  const { username } = await params
   const cookieStore = await cookies();
   const cookieHeader = cookieStore
     .getAll()
     .map((cookie) => `${cookie.name}=${cookie.value}`)
     .join("; ");
 
-  const res = await fetch("http://localhost:8000/profile", {
+  const res = await fetch(`http://localhost:8000/profile/${username}`, {
     headers: {
       Cookie: cookieHeader,
     },
@@ -34,7 +38,7 @@ export default async function ProfileLayout({
   console.log("user", user);
 
   const getuserfoodieImages = async () => {
-    const res = await fetch("http://localhost:8000/listfoodieitems", {
+    const res = await fetch(`http://localhost:8000/listfoodieitems/${username}`, {
       headers: {
         Cookie: cookieHeader,
       },
@@ -55,7 +59,7 @@ export default async function ProfileLayout({
   const foodItems = await getuserfoodieImages();
 
   const getUserFollowing = async () => {
-    const req = await fetch("http://localhost:8000/users/following", {
+    const req = await fetch(`http://localhost:8000/users/following/${username}`, {
       method: "GET",
       headers: {
         Cookie: cookieHeader,
@@ -79,7 +83,7 @@ export default async function ProfileLayout({
   console.log("following", following);
 
   const getUserFollowers = async () => {
-    const req = await fetch("http://localhost:8000/users/followers", {
+    const req = await fetch(`http://localhost:8000/users/followers/${username}`, {
       method: "GET",
       headers: {
         Cookie: cookieHeader,
@@ -101,7 +105,7 @@ export default async function ProfileLayout({
   const followers = await getUserFollowers();
 
   const getHighlights = async () => {
-    const req = await fetch("http://localhost:8000/profile/highlights", {
+    const req = await fetch(`http://localhost:8000/profile/highlights/${username}`, {
       method: "GET",
       headers: {
         Cookie: cookieHeader,
@@ -121,7 +125,7 @@ export default async function ProfileLayout({
   const highlights = await getHighlights();
 
   const getTryLater = async () => {
-    const req = await fetch("http://localhost:8000/newItem/totry/", {
+    const req = await fetch(`http://localhost:8000/newItem/totry/${username}`, {
       method: "GET",
       headers: {
         Cookie: cookieHeader,

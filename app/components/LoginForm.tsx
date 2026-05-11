@@ -29,9 +29,10 @@ export default function LoginForm() {
         return;
       }
 
-      // console.log('login response', )
+      const data = await res.json()
 
-      router.push("/profile");
+      router.push(`/profile/${data.user_name}`);
+      
     } catch (error) {
       console.log(error);
     }

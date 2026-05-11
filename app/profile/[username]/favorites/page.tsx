@@ -2,7 +2,19 @@ import { cookies } from "next/headers";
 import FavoritesList from "@/app/components/FavoritesList";
 import { FoodItem } from "@/app/schemas/schemas";
 
-export default async function UserFavorites() {
+interface UserFavoritesProps {
+  params: {
+    username: string;
+  };
+}
+
+export default async function UserFavorites({params}: UserFavoritesProps) {
+
+ 
+
+  const username = params.username
+
+   console.log('username------>', username)
 
   const cookieStore = await cookies();
   const cookieHeader = cookieStore
@@ -11,7 +23,7 @@ export default async function UserFavorites() {
     .join("; ");
 
   const getUserFavorites = async () => {
-    const req = await fetch("http://localhost:8000/foods/favorites", {
+    const req = await fetch(`http://localhost:8000/foods/favorites/${username}`, {
       headers: {
         Cookie: cookieHeader,
       },

@@ -63,11 +63,9 @@ export default function ProfileHeader({
   user,
   following,
   followers,
-  // highlights,
   selectedFile,
   openMetaDialog,
   setOpenMetaDialog,
-  // fileInputRef
 }: ProfileHeaderProps) {
   // const [selectedFile, setSelectedFile] = useState<File | null>(null);
   // const [openMetaDialog, setOpenMetaDialog] = useState(false);
@@ -76,7 +74,7 @@ export default function ProfileHeader({
   const [location, setLocation] = useState("");
   const [grade, setGrade] = useState(0);
   const [type, setType] = useState("");
-  const { foodList, setFoodList } = useUI();
+  const { foodList, setFoodList, highlights, setHighlights } = useUI();
   const [error, setError] = useState<Error | null>(null);
   const [page, setPage] = useState(0);
   const [openProfile, setOpenProfile] = useState(false);
@@ -88,7 +86,7 @@ export default function ProfileHeader({
   const [open, setOpen] = useState(false);
   // const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const { highlights, setHighlights } = useUI();
+  // const { highlights, setHighlights } = useUI();
 
   useEffect(() => {
     setUserProfile(user);
@@ -399,7 +397,7 @@ export default function ProfileHeader({
               sx={{ height: "4em", display: "flex", cursor: "pointer" }}
             />
           </Link>
-          <Link href="/profile/favorites">
+          <Link href={`/profile/${user.user_name}/favorites`}>
             <BookmarkIcon sx={{ height: "4em", cursor: "pointer" }} />
           </Link>
           <Link href="/profile/newItem">

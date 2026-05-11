@@ -13,10 +13,12 @@ import {
 import { useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import { User } from "../schemas/schemas";
+import { useRouter } from "next/navigation";
 
 export default function Users() {
   const [search, setSearch] = useState("");
   const [user, setUser] = useState<User | null>(null);
+  const router = useRouter();
 
   const handleSearch = async () => {
     console.log("search users");
@@ -45,8 +47,11 @@ export default function Users() {
   };
 
   const handleUserSelection = () => {
-    console.log('')
-  }
+    console.log("");
+    if (!user) return;
+
+    router.push(`/profile/${user.user_name}`);
+  };
 
   return (
     <Grid size={12}>
@@ -92,7 +97,10 @@ export default function Users() {
             <Typography sx={{ marginTop: 5 }}>No Users to display</Typography>
           ) : null}
           {user ? (
-            <ListItem sx={{marginTop: 1, cursor: 'pointer'}} onClick={handleUserSelection}>
+            <ListItem
+              sx={{ marginTop: 1, cursor: "pointer" }}
+              onClick={handleUserSelection}
+            >
               <ListItemAvatar>
                 <Avatar
                   id="profile_img"

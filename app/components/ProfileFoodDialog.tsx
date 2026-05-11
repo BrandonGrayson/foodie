@@ -127,7 +127,7 @@ export default function ProfileFoodDialog({
 
     const loadLikes = async () => {
       try {
-        const res = await fetch("http://localhost:8000/foods/likes", {
+        const res = await fetch(`http://localhost:8000/foods/likes/${user.user_name}`, {
           credentials: "include",
         });
 
@@ -238,7 +238,7 @@ export default function ProfileFoodDialog({
 
       try {
         const res = await fetch(
-          "http://localhost:8000/profile/foods/favorites",
+          `http://localhost:8000/profile/foods/favorites/${user.user_name}`,
           {
             credentials: "include",
           },
@@ -365,7 +365,7 @@ export default function ProfileFoodDialog({
 
   const handleBookmarkedItem = async () => {
     try {
-      const req = await fetch(`http://localhost:8000/foods/${foodItem.id}/favorites`, {
+      const req = await fetch(`http://localhost:8000/foods/${foodItem.id}/favorites/${user.user_name}`, {
         method: "POST",
         credentials: "include",
       });
@@ -403,7 +403,6 @@ export default function ProfileFoodDialog({
   /* ---------------------------
      UI
   --------------------------- */
-
   console.log("open", open);
 
   return (
