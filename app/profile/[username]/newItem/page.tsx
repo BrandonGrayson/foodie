@@ -1,15 +1,22 @@
 import { cookies } from "next/headers";
 import NewItemsList from "@/app/components/NewItemsList";
 
-export default async function NewItem() {
+interface UserFavoritesProps {
+  params: Promise<{
+    username: string;
+  }>;
+}
+
+export default async function NewItem({params}: UserFavoritesProps) {
   const cookieStore = await cookies();
+  const { username } = await params;
   const cookieHeader = cookieStore
     .getAll()
     .map((cookie) => `${cookie.name}=${cookie.value}`)
     .join("; ");
 
   const getNewItems = async () => {
-    const req = await fetch("http://localhost:8000/newItem/totry", {
+    const req = await fetch(`http://localhost:8000/newItem/totry/${username}`, {
       method: "GET",
       headers: {
         Cookie: cookieHeader,

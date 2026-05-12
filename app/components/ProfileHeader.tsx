@@ -400,10 +400,10 @@ export default function ProfileHeader({
           <Link href={`/profile/${user.user_name}/favorites`}>
             <BookmarkIcon sx={{ height: "4em", cursor: "pointer" }} />
           </Link>
-          <Link href="/profile/newItem">
+          <Link href={`/profile/${user.user_name}/newItem`}>
             <ChecklistIcon sx={{ height: "4em", cursor: "pointer" }} />
           </Link>
-          <Link href="/profile/topTen">
+          <Link href={`/profile/${user.user_name}/topTen`}>
             <Timer10SelectIcon sx={{ height: "4em", cursor: "pointer" }} />
           </Link>
           <Link href="/profile/search">

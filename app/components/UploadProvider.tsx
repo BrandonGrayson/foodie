@@ -16,6 +16,7 @@ import {
   Box
 } from "@mui/material";
 import { useUI } from "../providers/providers";
+import { useParams } from "next/navigation";
 
 interface UploadProviderProps {
   user: User;
@@ -41,6 +42,9 @@ export default function UploadProvider({
   const [menuItem, setMenuItem] = useState("");
   const [error, setError] = useState<Error | null>(null);
   const { setTryLater } = useUI()
+  const params = useParams();
+
+  const username = params.username;
 
   const uploadImageMetaData = async (key: string) => {
     const NewItemMetaDay = {
@@ -50,7 +54,7 @@ export default function UploadProvider({
     };
 
     try {
-      const res = await fetch("http://localhost:8000/newItem/totry", {
+      const res = await fetch(`http://localhost:8000/newItem/totry/${username}`, {
         method: "POST",
         credentials: "include", // 👈 important if using auth cookies
         headers: {
