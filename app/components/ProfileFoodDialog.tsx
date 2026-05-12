@@ -305,7 +305,7 @@ export default function ProfileFoodDialog({
 
     try {
       const req = await fetch(
-        `http://localhost:8000/foods/comments/${foodItem.id}`,
+        `http://localhost:8000/foods/comments/${foodItem.id}/${user.user_name}`,
         {
           method: "POST",
           credentials: "include",

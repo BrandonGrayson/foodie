@@ -1,6 +1,5 @@
 import { cookies } from "next/headers";
 import FavoritesList from "@/app/components/FavoritesList";
-import { FoodItem } from "@/app/schemas/schemas";
 
 interface UserFavoritesProps {
   params: {
@@ -10,9 +9,7 @@ interface UserFavoritesProps {
 
 export default async function UserFavorites({params}: UserFavoritesProps) {
 
- 
-
-  const username = params.username
+  const {username} = await params
 
    console.log('username------>', username)
 
