@@ -406,7 +406,7 @@ export default function ProfileHeader({
           <Link href={`/profile/${user.user_name}/topTen`}>
             <Timer10SelectIcon sx={{ height: "4em", cursor: "pointer" }} />
           </Link>
-          <Link href="/profile/search">
+          <Link href={`/profile/${user.user_name}/search`}>
             <SearchIcon sx={{ height: "4em", cursor: "pointer" }} />
           </Link>
         </Stack>

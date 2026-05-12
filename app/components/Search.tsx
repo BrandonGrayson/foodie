@@ -131,9 +131,9 @@ export default function Search({ topTenItems }: SearchProps) {
             fullWidth
             sx={{
               backgroundColor: "white",
-              borderRadius: "50px", // outer wrapper (optional)
+              borderRadius: "50px",
               "& .MuiOutlinedInput-root": {
-                borderRadius: "50px", // 🔥 this is what actually rounds it
+                borderRadius: "50px", 
               },
             }}
             onChange={(e) => setSearch(e.target.value)}

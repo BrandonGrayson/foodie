@@ -1,4 +1,5 @@
 "use client";
+
 import {
   Paper,
   BottomNavigation,
@@ -17,6 +18,7 @@ import { RefObject } from "react";
 import HomeIcon from "@mui/icons-material/Home";
 import { useRouter } from "next/navigation";
 import SearchIcon from "@mui/icons-material/Search";
+import { useParams } from "next/navigation";
 
 interface BottomNavProps {
   fileInputRef: RefObject<HTMLInputElement | null>;
@@ -29,6 +31,8 @@ export default function BottomNav({
 }: BottomNavProps) {
   const [openUploadTypeDialog, setOpenUploadTypeDialog] = useState(false);
   const router = useRouter();
+  const params = useParams();
+  const username = params.username;
 
   const uploadArray = ["Post", "Try Later"];
 
@@ -79,7 +83,7 @@ export default function BottomNav({
           <BottomNavigationAction
             value="add"
             icon={<HomeIcon fontSize="large" />}
-            onClick={() => router.push("/feed")}
+            onClick={() => router.push(`/feed/${username}`)}
           />
           <BottomNavigationAction
             value="add"
@@ -94,12 +98,12 @@ export default function BottomNav({
           <BottomNavigationAction
             value="add"
             icon={<AccountCircleIcon fontSize="large" />}
-            onClick={() => router.push("/profile")}
+            onClick={() => router.push(`/profile/${username}`)}
           />
           <BottomNavigationAction
             value="add"
             icon={<SettingsIcon fontSize="large" />}
-            onClick={() => router.push("/profile")}
+            // onClick={() => router.push(`/settings/${username}`)}
           />
         </BottomNavigation>
       </Paper>
