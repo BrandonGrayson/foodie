@@ -346,6 +346,10 @@ export default function ProfileHeader({
             </Box>
           </Stack>
 
+          {
+            
+          }
+
           <Button onClick={() => setOpenProfile(true)}>Edit Profile</Button>
           <Box display="flex" alignItems="center" gap={1} sx={{ mt: 2 }}>
             <IconButton sx={{ color: "white" }} onClick={handlePrev}>
@@ -392,7 +396,7 @@ export default function ProfileHeader({
             lg: 10,
           }}
         >
-          <Link href="/profile">
+          <Link href={`/profile/${user.user_name}/`}>
             <AppsIcon
               sx={{ height: "4em", display: "flex", cursor: "pointer" }}
             />

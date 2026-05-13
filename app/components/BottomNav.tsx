@@ -19,20 +19,21 @@ import HomeIcon from "@mui/icons-material/Home";
 import { useRouter } from "next/navigation";
 import SearchIcon from "@mui/icons-material/Search";
 import { useParams } from "next/navigation";
+import { User } from "../schemas/schemas";
 
 interface BottomNavProps {
   fileInputRef: RefObject<HTMLInputElement | null>;
   setUploadType: React.Dispatch<React.SetStateAction<string>>;
+  user: User
 }
 
 export default function BottomNav({
   fileInputRef,
   setUploadType,
+  user
 }: BottomNavProps) {
   const [openUploadTypeDialog, setOpenUploadTypeDialog] = useState(false);
   const router = useRouter();
-  const params = useParams();
-  const username = params.username;
 
   const uploadArray = ["Post", "Try Later"];
 
@@ -83,7 +84,7 @@ export default function BottomNav({
           <BottomNavigationAction
             value="add"
             icon={<HomeIcon fontSize="large" />}
-            onClick={() => router.push(`/feed/${username}`)}
+            onClick={() => router.push(`/feed/${user.user_name}`)}
           />
           <BottomNavigationAction
             value="add"
@@ -98,7 +99,7 @@ export default function BottomNav({
           <BottomNavigationAction
             value="add"
             icon={<AccountCircleIcon fontSize="large" />}
-            onClick={() => router.push(`/profile/${username}`)}
+            onClick={() => router.push(`/profile/${user.user_name}`)}
           />
           <BottomNavigationAction
             value="add"
