@@ -24,13 +24,11 @@ import { User } from "../schemas/schemas";
 interface BottomNavProps {
   fileInputRef: RefObject<HTMLInputElement | null>;
   setUploadType: React.Dispatch<React.SetStateAction<string>>;
-  user: User
 }
 
 export default function BottomNav({
   fileInputRef,
   setUploadType,
-  user
 }: BottomNavProps) {
   const [openUploadTypeDialog, setOpenUploadTypeDialog] = useState(false);
   const router = useRouter();
@@ -84,7 +82,7 @@ export default function BottomNav({
           <BottomNavigationAction
             value="add"
             icon={<HomeIcon fontSize="large" />}
-            onClick={() => router.push(`/feed/${user.user_name}`)}
+            // onClick={() => router.push(`/feed/${user.user_name}`)}
           />
           <BottomNavigationAction
             value="add"
@@ -99,7 +97,7 @@ export default function BottomNav({
           <BottomNavigationAction
             value="add"
             icon={<AccountCircleIcon fontSize="large" />}
-            onClick={() => router.push(`/profile/${user.user_name}`)}
+            // onClick={() => router.push(`/profile/${user.user_name}`)}
           />
           <BottomNavigationAction
             value="add"

@@ -1,8 +1,8 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
-import ProfileProviders from "../../providers/providers";
-import UploadProvider from "../../components/UploadProvider";
+import ProfileProviders from "@/app/providers/providers";
+import UploadProvider from "@/app/components/UploadProvider";
 
 interface ProfileLayoutProps {
   children: ReactNode,
