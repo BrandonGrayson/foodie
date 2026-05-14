@@ -28,6 +28,7 @@ import ModeCommentIcon from "@mui/icons-material/ModeComment";
 import Image from "next/image";
 import { useSwipeable } from "react-swipeable";
 import { useUI } from "../providers/providers";
+import { useUser } from "../providers/MainProvider";
 import { useState, useEffect, useRef } from "react";
 
 interface FoodItem {
@@ -116,7 +117,8 @@ export default function ProfileFoodDialog({
   const comments = foodData.comments ?? [];
   const isLiked = foodData.liked ?? false;
   const isBookmarked = foodData.bookmarked ?? false;
-  const { user, setFoodList } = useUI();
+  const { setFoodList } = useUI();
+  const { user } = useUser()
 
   /* ---------------------------
      LOAD LIKES
