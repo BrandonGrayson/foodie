@@ -4,17 +4,19 @@ import {
   createContext,
   useContext,
   ReactNode,
+  useState
 } from "react";
 
 import { User } from "../schemas/schemas";
 
 interface MainUIContextType {
-    user: User | null;
+    user: User;
+    setUser: React.Dispatch<React.SetStateAction<User>>;
 }
 
 interface MainProviderProps {
-    user: User | null
-    children: ReactNode
+    user: User;
+    children: ReactNode;
 }
 
 const UserContext = createContext<MainUIContextType | undefined>(undefined);
@@ -30,8 +32,9 @@ export function useUser() {
 }
 
 export default function MainProvider({user, children}: MainProviderProps) {
+    const [currentUser, setCurrentUser] = useState(user);
     return (
-        <UserContext.Provider value={{user}} >
+        <UserContext.Provider value={{user: currentUser, setUser: setCurrentUser}} >
             {children}
         </UserContext.Provider>
     )   

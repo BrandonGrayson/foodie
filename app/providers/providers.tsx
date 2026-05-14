@@ -26,7 +26,7 @@ interface FoodItem {
 interface UIContextType {
   foodList: FoodItem[];
   setFoodList: Dispatch<SetStateAction<FoodItem[]>>;
-  user: User;
+  // user: User;
   setTryLater: Dispatch<SetStateAction<TryLater[]>>;
   tryLaterItems: TryLater[]
   highlights: FoodItem[];
@@ -48,7 +48,7 @@ export function useUI() {
 export default function ProfileProviders({
   children,
   initialFoodList,
-  user,
+  // user,
   tryLater,
   highlighedItems
 }: {
@@ -63,7 +63,7 @@ export default function ProfileProviders({
   const [highlights, setHighlights] = useState(highlighedItems)
 
   return (
-    <UIContext.Provider value={{ foodList, setFoodList, user, setTryLater, tryLaterItems, highlights, setHighlights }}>
+    <UIContext.Provider value={{ foodList, setFoodList, setTryLater, tryLaterItems, highlights, setHighlights }}>
         {children}
     </UIContext.Provider>
   );

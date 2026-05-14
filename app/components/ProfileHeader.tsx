@@ -1,4 +1,5 @@
 "use client";
+
 import {
   Stack,
   Typography,
@@ -12,7 +13,7 @@ import {
   Box,
   Alert,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Grid from "@mui/material/Grid";
 import Avatar from "@mui/material/Avatar";
 import AppsIcon from "@mui/icons-material/Apps";
@@ -25,6 +26,7 @@ import ChecklistIcon from "@mui/icons-material/Checklist";
 import Timer10SelectIcon from "@mui/icons-material/Timer10Select";
 import SearchIcon from "@mui/icons-material/Search";
 import ProfileFoodDialog from "./ProfileFoodDialog";
+import { useUser } from "../providers/MainProvider";
 
 interface User {
   created_at: string;
@@ -49,7 +51,7 @@ interface Followers {
 }
 
 interface ProfileHeaderProps {
-  user: User;
+  // user: User;
   following: Following[];
   followers: Followers[];
   // highlights: FoodItem[];
@@ -60,13 +62,14 @@ interface ProfileHeaderProps {
 }
 
 export default function ProfileHeader({
-  user,
+  // user,
   following,
   followers,
   selectedFile,
   openMetaDialog,
   setOpenMetaDialog,
 }: ProfileHeaderProps) {
+  const { user, setUser } = useUser();
   // const [selectedFile, setSelectedFile] = useState<File | null>(null);
   // const [openMetaDialog, setOpenMetaDialog] = useState(false);
   const [name, setName] = useState("");
@@ -81,7 +84,7 @@ export default function ProfileHeader({
   const [profileFile, setProfileFile] = useState<File | null>(null);
   const PAGE_SIZE = 6;
   const [userProfile, setUserProfile] = useState<User>(user);
-  const [originalUser, setOriginalUser] = useState(user);
+  // const [originalUser, setOriginalUser] = useState(user);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [open, setOpen] = useState(false);
   // const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -90,7 +93,7 @@ export default function ProfileHeader({
 
   useEffect(() => {
     setUserProfile(user);
-    setOriginalUser(user);
+    setUser(user);
   }, [user]);
 
   const totalPages = Math.ceil(highlights.length / PAGE_SIZE);
@@ -103,10 +106,12 @@ export default function ProfileHeader({
     setPage((prev) => (prev - 1 + totalPages) % totalPages); // loop backwards
   };
 
-  const visibleFoods = highlights.slice(
+const visibleFoods = useMemo(() => {
+  return highlights.slice(
     page * PAGE_SIZE,
-    page * PAGE_SIZE + PAGE_SIZE,
+    page * PAGE_SIZE + PAGE_SIZE
   );
+}, [highlights, page]);
 
   const handleClose = () => {
     setOpenMetaDialog(false);
@@ -170,14 +175,16 @@ export default function ProfileHeader({
   const updateUserProfile = async () => {
     const formData = new FormData();
 
-    // Only append changed fields
-    if (userProfile.bio !== originalUser.bio) {
-      formData.append("bio", userProfile.bio ?? "");
-    }
+    if (userProfile && user) {
+      if (userProfile.bio !== user.bio) {
+        formData.append("bio", userProfile.bio ?? "");
+      }
 
-    if (userProfile.phone_number !== originalUser.phone_number) {
-      formData.append("phone_number", userProfile.phone_number ?? "");
+      if (userProfile.phone_number !== user.phone_number) {
+        formData.append("phone_number", userProfile.phone_number ?? "");
+      }
     }
+    // Only append changed fields
 
     if (profileFile) {
       formData.append("file", profileFile);
@@ -232,7 +239,7 @@ export default function ProfileHeader({
       if (!updatedUser) return;
 
       setUserProfile(updatedUser);
-      setOriginalUser(updatedUser);
+      // setOriginalUser(updatedUser);
 
       setProfileFile(null);
       setOpenProfile(false);
@@ -252,10 +259,13 @@ export default function ProfileHeader({
 
   const handleHighlightDelete = async (foodItem: FoodItem) => {
     try {
-      const req = await fetch(`http://localhost:8000/profile/highlights/${foodItem.id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
+      const req = await fetch(
+        `http://localhost:8000/profile/highlights/${foodItem.id}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        },
+      );
 
       if (!req.ok) return;
 
@@ -271,9 +281,9 @@ export default function ProfileHeader({
   };
 
   const handleHighlightedItem = (index: number) => {
-    setCurrentIndex(index)
-    setOpen(true)
-  }
+    setCurrentIndex(index);
+    setOpen(true);
+  };
 
   if (error) {
     return (
@@ -283,7 +293,7 @@ export default function ProfileHeader({
     );
   }
 
-  console.log("user", user);
+  // console.log("user", user);
 
   return (
     <>
@@ -316,7 +326,7 @@ export default function ProfileHeader({
           >
             <Avatar
               id="profile_img"
-              src={userProfile.url}
+              src={userProfile.url ?? ""}
               sx={{
                 width: { xs: 48, sm: 56, md: 64, lg: 80 },
                 height: { xs: 48, sm: 56, md: 64, lg: 80 }, // fix typo (47 → 48)
@@ -346,9 +356,7 @@ export default function ProfileHeader({
             </Box>
           </Stack>
 
-          {
-            
-          }
+          {}
 
           <Button onClick={() => setOpenProfile(true)}>Edit Profile</Button>
           <Box display="flex" alignItems="center" gap={1} sx={{ mt: 2 }}>

@@ -19,7 +19,7 @@ import { useUI } from "../providers/providers";
 import { useParams } from "next/navigation";
 
 interface UploadProviderProps {
-  user: User;
+  // user: User;
   following: Following[];
   followers: Followers[];
   highlights: FoodItem[];
@@ -28,7 +28,7 @@ interface UploadProviderProps {
 
 export default function UploadProvider({
   children,
-  user,
+  // user,
   following,
   followers,
   highlights,
@@ -139,7 +139,7 @@ export default function UploadProvider({
   return (
     <>
       <ProfileHeader
-        user={user}
+        // user={user}
         followers={followers}
         following={following}
         // highlights={highlights}
