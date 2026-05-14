@@ -20,22 +20,22 @@ export default async function ProfileLayout({
     .map((cookie) => `${cookie.name}=${cookie.value}`)
     .join("; ");
 
-  const res = await fetch(`http://localhost:8000/profile/${username}`, {
-    headers: {
-      Cookie: cookieHeader,
-    },
-    cache: "no-store",
-  });
+  // const res = await fetch(`http://localhost:8000/profile/${username}`, {
+  //   headers: {
+  //     Cookie: cookieHeader,
+  //   },
+  //   cache: "no-store",
+  // });
 
-  console.log("res", res);
+  // console.log("res", res);
 
-  if (!res.ok) {
-    redirect("/");
-  }
+  // if (!res.ok) {
+  //   redirect("/");
+  // }
 
-  const user = await res.json();
+  // const user = await res.json();
 
-  console.log("user", user);
+  // console.log("user", user);
 
   const getuserfoodieImages = async () => {
     const res = await fetch(`http://localhost:8000/listfoodieitems/${username}`, {
@@ -145,12 +145,13 @@ export default async function ProfileLayout({
   const tryLaterItems = await getTryLater()
 
   return (
-    <ProfileProviders initialFoodList={foodItems} user={user} tryLater={tryLaterItems} highlighedItems={highlights}>
+    // user used to exisit in ProfileProviders props 
+    <ProfileProviders initialFoodList={foodItems} tryLater={tryLaterItems} highlighedItems={highlights}>
       <div
         style={{ width: "100%", overflow: "hidden", boxSizing: "border-box" }}
       >
         <UploadProvider
-          user={user}
+          // user={user}
           followers={followers}
           following={following}
           highlights={highlights}

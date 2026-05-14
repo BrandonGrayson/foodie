@@ -54,7 +54,7 @@ export default function ProfileProviders({
 }: {
   children: ReactNode;
   initialFoodList: FoodItem[];
-  user: User;
+  // user: User;
   tryLater: TryLater[];
   highlighedItems: FoodItem[];
 }) {
