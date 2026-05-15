@@ -27,8 +27,8 @@ interface NewItemsListProps {
 export default function NewItemsList({ newItems }: NewItemsListProps) {
   const [open, setOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const tryItem = newItems[currentIndex];
   const [newItemsList, setNewItems] = useState(newItems)
+    const tryItem = newItemsList[currentIndex];
 
   const handleImageSelection = (index: number) => {
     setCurrentIndex(index);
@@ -106,7 +106,7 @@ export default function NewItemsList({ newItems }: NewItemsListProps) {
             }}
           >
             <Image
-              src={tryItem.url}
+              src={tryItem?.url ?? ""}
               alt="Item you wanted to try"
               fill
               style={{ objectFit: "cover" }}
@@ -114,10 +114,10 @@ export default function NewItemsList({ newItems }: NewItemsListProps) {
           </Box>        
 
           <Stack sx={{ pt: 2 }} spacing={1}>
-            {tryItem.restaurant_name && (
+            {tryItem?.restaurant_name && (
               <Typography>{tryItem.restaurant_name}</Typography>
             )}
-            {tryItem.menu_item && <Typography>{tryItem.menu_item}</Typography>}
+            {tryItem?.menu_item && <Typography>{tryItem?.menu_item}</Typography>}
           </Stack>
         </DialogContent>
 
