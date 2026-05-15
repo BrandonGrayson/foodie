@@ -18,8 +18,7 @@ import { RefObject } from "react";
 import HomeIcon from "@mui/icons-material/Home";
 import { useRouter } from "next/navigation";
 import SearchIcon from "@mui/icons-material/Search";
-import { useParams } from "next/navigation";
-import { User } from "../schemas/schemas";
+import { useUser } from "../providers/MainProvider";
 
 interface BottomNavProps {
   fileInputRef: RefObject<HTMLInputElement | null>;
@@ -34,6 +33,7 @@ export default function BottomNav({
   const router = useRouter();
 
   const uploadArray = ["Post", "Try Later"];
+  const {user} = useUser()
 
   const handleListItemClick = (item: string) => {
     setUploadType(item);
@@ -97,7 +97,7 @@ export default function BottomNav({
           <BottomNavigationAction
             value="add"
             icon={<AccountCircleIcon fontSize="large" />}
-            // onClick={() => router.push(`/profile/${user.user_name}`)}
+            onClick={() => router.push(`/profile/${user.user_name}`)}
           />
           <BottomNavigationAction
             value="add"
