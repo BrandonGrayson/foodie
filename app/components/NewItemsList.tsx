@@ -27,8 +27,8 @@ interface NewItemsListProps {
 export default function NewItemsList({ newItems }: NewItemsListProps) {
   const [open, setOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [newItemsList, setNewItems] = useState(newItems)
-    const tryItem = newItemsList[currentIndex];
+  const [newItemsList, setNewItems] = useState(newItems);
+  const tryItem = newItemsList[currentIndex];
 
   const handleImageSelection = (index: number) => {
     setCurrentIndex(index);
@@ -49,12 +49,23 @@ export default function NewItemsList({ newItems }: NewItemsListProps) {
       if (!req.ok) return;
 
       const data = await req.json();
-      setNewItems((prev) => prev.filter((food) => food.id !== data.id))
+      setNewItems((prev) => {
+        const updated = prev.filter((food) => food.id !== data.id);
+
+        if (updated.length === 0) {
+          setOpen(false);
+          setCurrentIndex(0);
+        } else if (currentIndex >= updated.length) {
+          setCurrentIndex(updated.length - 1);
+        }
+
+        return updated;
+      });
 
       setOpen(false);
     } catch (err) {
       // setError(err as Error);
-      console.log('error', err)
+      console.log("error", err);
     }
   };
 
@@ -111,13 +122,15 @@ export default function NewItemsList({ newItems }: NewItemsListProps) {
               fill
               style={{ objectFit: "cover" }}
             />
-          </Box>        
+          </Box>
 
           <Stack sx={{ pt: 2 }} spacing={1}>
             {tryItem?.restaurant_name && (
               <Typography>{tryItem.restaurant_name}</Typography>
             )}
-            {tryItem?.menu_item && <Typography>{tryItem?.menu_item}</Typography>}
+            {tryItem?.menu_item && (
+              <Typography>{tryItem?.menu_item}</Typography>
+            )}
           </Stack>
         </DialogContent>
 

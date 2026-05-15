@@ -30,19 +30,33 @@ export default function BottomNav({
   setUploadType,
 }: BottomNavProps) {
   const [openUploadTypeDialog, setOpenUploadTypeDialog] = useState(false);
+  const [openSettingsMenu, setOpenSettingsMenu] = useState(false);
   const router = useRouter();
 
   const uploadArray = ["Post", "Try Later"];
-  const {user} = useUser()
+  const { user } = useUser();
 
   const handleListItemClick = (item: string) => {
     setUploadType(item);
 
     setOpenUploadTypeDialog(false);
 
-    // 🔥 manually trigger file input
     if (fileInputRef) {
       fileInputRef.current?.click();
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch("http://localhost:8000/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      router.push("/");
+      router.refresh();
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -74,6 +88,27 @@ export default function BottomNav({
         </List>
       )}
 
+      {openSettingsMenu && (
+        <List
+          sx={{
+            position: "fixed",
+            bottom: 70,
+            right: 10,
+            width: "160px",
+            bgcolor: "background.paper",
+            borderRadius: 2,
+            boxShadow: 3,
+            zIndex: 1300,
+          }}
+        >
+          <ListItem disablePadding>
+            <ListItemButton onClick={handleLogout}>
+              <ListItemText primary="Logout" />
+            </ListItemButton>
+          </ListItem>
+        </List>
+      )}
+
       <Paper
         sx={{ position: "fixed", bottom: 0, left: 0, right: 0 }}
         elevation={3}
@@ -87,7 +122,7 @@ export default function BottomNav({
           <BottomNavigationAction
             value="add"
             icon={<AddCircleOutlineIcon fontSize="large" />}
-            onClick={() => setOpenUploadTypeDialog(true)}
+            onClick={() => setOpenUploadTypeDialog(!openUploadTypeDialog)}
           />
           <BottomNavigationAction
             value="add"
@@ -102,7 +137,7 @@ export default function BottomNav({
           <BottomNavigationAction
             value="add"
             icon={<SettingsIcon fontSize="large" />}
-            // onClick={() => router.push(`/settings/${username}`)}
+            onClick={() => setOpenSettingsMenu(!openSettingsMenu)}
           />
         </BottomNavigation>
       </Paper>
