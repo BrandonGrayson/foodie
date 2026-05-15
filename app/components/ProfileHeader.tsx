@@ -51,7 +51,7 @@ interface Followers {
 }
 
 interface ProfileHeaderProps {
-  // user: User;
+  profileUser: User;
   following: Following[];
   followers: Followers[];
   // highlights: FoodItem[];
@@ -62,7 +62,7 @@ interface ProfileHeaderProps {
 }
 
 export default function ProfileHeader({
-  // user,
+  profileUser,
   following,
   followers,
   selectedFile,
@@ -83,18 +83,18 @@ export default function ProfileHeader({
   const [openProfile, setOpenProfile] = useState(false);
   const [profileFile, setProfileFile] = useState<File | null>(null);
   const PAGE_SIZE = 6;
-  const [userProfile, setUserProfile] = useState<User>(user);
+  const [editableProfile, setEditableProfile] = useState<User>(profileUser);
   // const [originalUser, setOriginalUser] = useState(user);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [open, setOpen] = useState(false);
+  const isOwnProfile = user.id === profileUser.id;
   // const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // const { highlights, setHighlights } = useUI();
 
   useEffect(() => {
-    setUserProfile(user);
-    setUser(user);
-  }, [user]);
+    setEditableProfile(profileUser);
+  }, [profileUser]);
 
   const totalPages = Math.ceil(highlights.length / PAGE_SIZE);
 
@@ -106,12 +106,9 @@ export default function ProfileHeader({
     setPage((prev) => (prev - 1 + totalPages) % totalPages); // loop backwards
   };
 
-const visibleFoods = useMemo(() => {
-  return highlights.slice(
-    page * PAGE_SIZE,
-    page * PAGE_SIZE + PAGE_SIZE
-  );
-}, [highlights, page]);
+  const visibleFoods = useMemo(() => {
+    return highlights.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
+  }, [highlights, page]);
 
   const handleClose = () => {
     setOpenMetaDialog(false);
@@ -175,13 +172,13 @@ const visibleFoods = useMemo(() => {
   const updateUserProfile = async () => {
     const formData = new FormData();
 
-    if (userProfile && user) {
-      if (userProfile.bio !== user.bio) {
-        formData.append("bio", userProfile.bio ?? "");
+    if (editableProfile && user) {
+      if (editableProfile.bio !== user.bio) {
+        formData.append("bio", editableProfile.bio ?? "");
       }
 
-      if (userProfile.phone_number !== user.phone_number) {
-        formData.append("phone_number", userProfile.phone_number ?? "");
+      if (editableProfile.phone_number !== user.phone_number) {
+        formData.append("phone_number", editableProfile.phone_number ?? "");
       }
     }
     // Only append changed fields
@@ -227,7 +224,9 @@ const visibleFoods = useMemo(() => {
   };
 
   const handleProfileClose = () => {
-    setOpenProfile(false);
+  setEditableProfile(profileUser);
+  setProfileFile(null);
+  setOpenProfile(false);
   };
 
   const handleUserProfileSubmit = async (e: React.FormEvent) => {
@@ -238,8 +237,8 @@ const visibleFoods = useMemo(() => {
 
       if (!updatedUser) return;
 
-      setUserProfile(updatedUser);
-      // setOriginalUser(updatedUser);
+      setEditableProfile(updatedUser);
+      setUser(updatedUser);
 
       setProfileFile(null);
       setOpenProfile(false);
@@ -326,7 +325,7 @@ const visibleFoods = useMemo(() => {
           >
             <Avatar
               id="profile_img"
-              src={userProfile.url ?? ""}
+              src={profileUser.url ?? ""}
               sx={{
                 width: { xs: 48, sm: 56, md: 64, lg: 80 },
                 height: { xs: 48, sm: 56, md: 64, lg: 80 }, // fix typo (47 → 48)
@@ -334,8 +333,8 @@ const visibleFoods = useMemo(() => {
             />
 
             <Box>
-              <Typography>{user.user_name}</Typography>
-              <Typography>{user.full_name}</Typography>
+              <Typography>{profileUser.user_name}</Typography>
+              <Typography>{profileUser.full_name}</Typography>
 
               <Stack direction="row" spacing={2}>
                 <Stack alignItems="center">
@@ -356,9 +355,12 @@ const visibleFoods = useMemo(() => {
             </Box>
           </Stack>
 
-          {}
+          {isOwnProfile ? (
+            <Button onClick={() => setOpenProfile(true)}>Edit Profile</Button>
+          ) : (
+            <Button>Follow</Button>
+          )}
 
-          <Button onClick={() => setOpenProfile(true)}>Edit Profile</Button>
           <Box display="flex" alignItems="center" gap={1} sx={{ mt: 2 }}>
             <IconButton sx={{ color: "white" }} onClick={handlePrev}>
               ←
@@ -404,21 +406,21 @@ const visibleFoods = useMemo(() => {
             lg: 10,
           }}
         >
-          <Link href={`/profile/${user.user_name}/`}>
+          <Link href={`/profile/${editableProfile.user_name}/`}>
             <AppsIcon
               sx={{ height: "4em", display: "flex", cursor: "pointer" }}
             />
           </Link>
-          <Link href={`/profile/${user.user_name}/favorites`}>
+          <Link href={`/profile/${editableProfile.user_name}/favorites`}>
             <BookmarkIcon sx={{ height: "4em", cursor: "pointer" }} />
           </Link>
-          <Link href={`/profile/${user.user_name}/newItem`}>
+          <Link href={`/profile/${editableProfile.user_name}/newItem`}>
             <ChecklistIcon sx={{ height: "4em", cursor: "pointer" }} />
           </Link>
-          <Link href={`/profile/${user.user_name}/topTen`}>
+          <Link href={`/profile/${editableProfile.user_name}/topTen`}>
             <Timer10SelectIcon sx={{ height: "4em", cursor: "pointer" }} />
           </Link>
-          <Link href={`/profile/${user.user_name}/search`}>
+          <Link href={`/profile/${editableProfile.user_name}/search`}>
             <SearchIcon sx={{ height: "4em", cursor: "pointer" }} />
           </Link>
         </Stack>
@@ -490,7 +492,7 @@ const visibleFoods = useMemo(() => {
             <Stack direction="row" sx={{ m: 2 }} spacing={2}>
               <Avatar
                 id="profile_img"
-                src={userProfile.url ?? ""}
+                src={editableProfile.url ?? ""}
                 sx={{
                   width: { xs: 48, sm: 56, md: 64, lg: 80 },
                   height: { xs: 48, sm: 56, md: 64, lg: 80 },
@@ -509,9 +511,9 @@ const visibleFoods = useMemo(() => {
             <Stack spacing={2}>
               <TextField
                 multiline
-                value={userProfile.bio ?? ""}
+                value={editableProfile.bio ?? ""}
                 onChange={(event) =>
-                  setUserProfile((prev) => ({
+                  setEditableProfile((prev) => ({
                     ...prev,
                     bio: event.target.value,
                   }))
@@ -521,12 +523,12 @@ const visibleFoods = useMemo(() => {
               />
               <TextField
                 onChange={(event) =>
-                  setUserProfile((prev) => ({
+                  setEditableProfile((prev) => ({
                     ...prev,
                     phone_number: event.target.value,
                   }))
                 }
-                value={userProfile.phone_number}
+                value={editableProfile.phone_number}
                 sx={{ m: 2 }}
                 placeholder="Phone Number"
               />

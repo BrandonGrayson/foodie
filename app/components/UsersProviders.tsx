@@ -8,7 +8,7 @@ export default function UsersProviders() {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [uploadType, setUploadType] = useState("");
-  const [user, setUser] = useState<User | null>(null);
+  // const [user, setUser] = useState<User | null>(null);
   
   return (
     <>
