@@ -14,6 +14,7 @@ export default async function Page({params}: SearchProps) {
     .getAll()
     .map((cookie) => `${cookie.name}=${cookie.value}`)
     .join("; ");
+    
   const getTopTenItems = async () => {
     const req = await fetch(`http://localhost:8000/rank/topten/${username}`, {
       headers: {

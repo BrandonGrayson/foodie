@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import UserFeed from "../components/UserFeed";
+import UserFeed from "@/app/components/UserFeed";
 
 export default async function Page() {
   const cookieStore = await cookies();
@@ -7,6 +7,7 @@ export default async function Page() {
     .getAll()
     .map((cookie) => `${cookie.name}=${cookie.value}`)
     .join("; ");
+    
   const getUserFeed = async () => {
     const req = await fetch("http://localhost:8000/profile/feed", {
       headers: {
@@ -29,7 +30,6 @@ export default async function Page() {
 
   return (
     <>
-      
       <UserFeed feed={feedItems} />
     </>
   );

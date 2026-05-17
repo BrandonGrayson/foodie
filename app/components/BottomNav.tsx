@@ -117,7 +117,7 @@ export default function BottomNav({
           <BottomNavigationAction
             value="add"
             icon={<HomeIcon fontSize="large" />}
-            // onClick={() => router.push(`/feed/${user.user_name}`)}
+            onClick={() => router.push(`/feed/${user.user_name}`)}
           />
           <BottomNavigationAction
             value="add"

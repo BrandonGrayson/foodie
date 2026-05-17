@@ -18,40 +18,71 @@ interface UserFeedProps {
   feed: FoodItem[];
 }
 export default function UserFeed({ feed }: UserFeedProps) {
+  console.log("feed", feed);
   return (
     <Grid container>
-      <Grid size={12} sx={{ display: "flex", justifyContent: "center" }}>
-        {feed.map((food) => (
-          <Card sx={{ maxWidth: 345, margin: 2 }} key={food.image_key}>
-            <Box
+      <Grid>
+        <Typography>This is the users feed</Typography>
+      </Grid>
+      <Grid
+        size={12}
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          width: "100%",
+        }}
+      >
+        <Stack
+          spacing={3}
+          sx={{
+            width: "100%",
+            maxWidth: 600, // instagram-like feed width
+            alignItems: "center",
+          }}
+        >
+          {feed.map((food) => (
+            <Card
+              key={food.image_key}
               sx={{
                 width: "100%",
-                aspectRatio: "16/9",
-                overflow: "hidden",
+                borderRadius: 3,
               }}
             >
-              <CardMedia
-                component="img"
-                image={food.url}
-                alt={food.name}
+              <Box
                 sx={{
                   width: "100%",
-                  height: "100%",
-                  objectFit: "cover", // 🔥 crops instead of stretching
+                  aspectRatio: "1 / 1", // instagram style
+                  overflow: "hidden",
                 }}
-              />
-            </Box>
+              >
+                <CardMedia
+                  component="img"
+                  image={food.url}
+                  alt={food.name}
+                  sx={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+              </Box>
 
-            <CardContent>
-              <Stack spacing={2}>
-                <Typography>{food.name}</Typography>
-                <Typography>{food.description}</Typography>
-                <Typography>{food.location}</Typography>
-                <Rating name="read-only" value={food.grade} readOnly />
-              </Stack>
-            </CardContent>
-          </Card>
-        ))}
+              <CardContent>
+                <Stack spacing={1}>
+                  <Typography fontWeight="bold">{food.name}</Typography>
+
+                  <Typography>{food.description}</Typography>
+
+                  <Typography color="text.secondary">
+                    {food.location}
+                  </Typography>
+
+                  <Rating name="read-only" value={food.grade} readOnly />
+                </Stack>
+              </CardContent>
+            </Card>
+          ))}
+        </Stack>
       </Grid>
     </Grid>
   );
