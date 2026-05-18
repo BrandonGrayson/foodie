@@ -65,3 +65,19 @@ export interface TopTen {
     created_at: string
 }
 
+export interface FeedItem {
+  comment_count: number
+  created_at: string
+  description: string
+  grade: number
+  id: number
+  image_key: string
+  like_count: number
+  liked_by_user: boolean
+  location: string
+  name: string
+  type: string
+  url: string
+  user_id: number
+}
+
