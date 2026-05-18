@@ -9,19 +9,7 @@ import {
   ReactNode,
 } from "react";
 import { TryLater, User } from "../schemas/schemas";
-
-interface FoodItem {
-  description: string;
-  grade: number;
-  id: number;
-  image_key: string;
-  url: string;
-  location: string;
-  name: string;
-  type: string;
-  user_id: number;
-  created_at: string;
-}
+import { FoodItem } from "../schemas/schemas";
 
 interface UIContextType {
   foodList: FoodItem[];

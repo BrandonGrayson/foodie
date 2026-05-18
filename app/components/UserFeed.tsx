@@ -1,7 +1,6 @@
 "use client";
 
 import Grid from "@mui/material/Grid";
-import { FeedItem } from "../schemas/schemas";
 import {
   Card,
   Box,
@@ -17,16 +16,22 @@ import BottomNav from "./BottomNav";
 import ModeCommentIcon from "@mui/icons-material/ModeComment";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import { useState } from "react";
+import ProfileFoodDialog from "./ProfileFoodDialog";
+import { FoodItem } from "../schemas/schemas";
 
 interface UserFeedProps {
-  feed: FeedItem[];
+  feed: FoodItem[];
 }
 export default function UserFeed({ feed }: UserFeedProps) {
   console.log("feed", feed);
-  const [userFeed, setUserFeed] = useState(feed);
+  const [userFeed, setUserFeed] = useState<FoodItem[]>(feed);
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [open, setOpen] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const handleUserLike = async (foodItem: FeedItem) => {
+  const foodItem = userFeed[currentIndex];
+
+  const handleUserLike = async (foodItem: FoodItem) => {
     if (!foodItem) return;
 
     try {
@@ -60,6 +65,11 @@ export default function UserFeed({ feed }: UserFeedProps) {
       setError(err as Error);
     }
   };
+
+  const handleComment = (index: number) => {
+    setCurrentIndex(index)
+    setOpen(true)
+  }
   return (
     <Grid container>
       <Grid
@@ -78,7 +88,7 @@ export default function UserFeed({ feed }: UserFeedProps) {
             alignItems: "center",
           }}
         >
-          {userFeed.map((food) => (
+          {userFeed.map((food, index) => (
             <Card
               key={food.image_key}
               sx={{
@@ -120,9 +130,9 @@ export default function UserFeed({ feed }: UserFeedProps) {
               </CardContent>
               <CardContent>
                 <Stack direction="row" spacing={1}>
-                  <FavoriteIcon onClick={() => handleUserLike(food)} />
+                  <FavoriteIcon color={food.liked_by_user ? "error" : "inherit"}  sx={{cursor: 'pointer'}} onClick={() => handleUserLike(food)} />
                   <Typography>{food.like_count}</Typography>
-                  <ModeCommentIcon />
+                  <ModeCommentIcon onClick={() => handleComment(index)} sx={{cursor: 'pointer'}} />
                   <Typography>{food.comment_count}</Typography>
                 </Stack>
               </CardContent>
@@ -130,6 +140,12 @@ export default function UserFeed({ feed }: UserFeedProps) {
           ))}
         </Stack>
       </Grid>
+      <ProfileFoodDialog
+       foodList={userFeed} 
+       currentIndex={currentIndex} 
+       setCurrentIndex={setCurrentIndex} 
+       open={open}
+       setOpen={setOpen}/>
     </Grid>
   );
 }

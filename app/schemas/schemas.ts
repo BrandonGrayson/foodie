@@ -1,14 +1,20 @@
 export interface FoodItem {
-  description: string;
-  grade: number;
   id: number;
+  name: string;
+  description: string;
+  location: string;
+  type: string;
+  grade: number;
   image_key: string;
   url: string;
-  location: string;
-  name: string;
-  type: string;
   user_id: number;
   created_at: string;
+
+  like_count: number;
+  comment_count: number;
+
+  liked_by_user: boolean;
+  bookmarked_by_user: boolean;
 }
 
 export interface NewItems {
@@ -63,21 +69,5 @@ export interface TopTen {
     rank: number
     url: string
     created_at: string
-}
-
-export interface FeedItem {
-  comment_count: number
-  created_at: string
-  description: string
-  grade: number
-  id: number
-  image_key: string
-  like_count: number
-  liked_by_user: boolean
-  location: string
-  name: string
-  type: string
-  url: string
-  user_id: number
 }
 

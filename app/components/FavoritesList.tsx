@@ -4,19 +4,7 @@ import FoodGrid from "./FoodGrid";
 import { useState } from "react";
 import ProfileFoodDialog from "./ProfileFoodDialog";
 import { useUI } from "../providers/providers";
-
-interface FoodItem {
-  description: string;
-  grade: number;
-  id: number;
-  image_key: string;
-  url: string;
-  location: string;
-  name: string;
-  type: string;
-  user_id: number;
-  created_at: string;
-}
+import { FoodItem } from "../schemas/schemas";
 
 interface FavoritesListProps {
   foodList: FoodItem[];

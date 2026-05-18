@@ -21,12 +21,12 @@ import IconButton from "@mui/material/IconButton";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import Link from "next/link";
 import { useUI } from "../providers/providers";
-import { FoodItem } from "../schemas/schemas";
 import ChecklistIcon from "@mui/icons-material/Checklist";
 import Timer10SelectIcon from "@mui/icons-material/Timer10Select";
 import SearchIcon from "@mui/icons-material/Search";
 import ProfileFoodDialog from "./ProfileFoodDialog";
 import { useUser } from "../providers/MainProvider";
+import { FoodItem } from "../schemas/schemas";
 
 interface User {
   created_at: string;
@@ -54,11 +54,9 @@ interface ProfileHeaderProps {
   profileUser: User;
   following: Following[];
   followers: Followers[];
-  // highlights: FoodItem[];
   selectedFile: File | null;
   openMetaDialog: boolean;
   setOpenMetaDialog: React.Dispatch<React.SetStateAction<boolean>>;
-  // fileInputRef: HTMLInputElement | null;
 }
 
 export default function ProfileHeader({
@@ -70,45 +68,62 @@ export default function ProfileHeader({
   setOpenMetaDialog,
 }: ProfileHeaderProps) {
   const { user, setUser } = useUser();
-  // const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  // const [openMetaDialog, setOpenMetaDialog] = useState(false);
+
+  const {
+    foodList,
+    setFoodList,
+    highlights,
+    setHighlights,
+  } = useUI();
+
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [grade, setGrade] = useState(0);
   const [type, setType] = useState("");
-  const { foodList, setFoodList, highlights, setHighlights } = useUI();
-  const [error, setError] = useState<Error | null>(null);
-  const [page, setPage] = useState(0);
-  const [openProfile, setOpenProfile] = useState(false);
-  const [profileFile, setProfileFile] = useState<File | null>(null);
-  const PAGE_SIZE = 6;
-  const [editableProfile, setEditableProfile] = useState<User>(profileUser);
-  // const [originalUser, setOriginalUser] = useState(user);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [open, setOpen] = useState(false);
-  const isOwnProfile = user.id === profileUser.id;
-  // const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // const { highlights, setHighlights } = useUI();
+  const [error, setError] = useState<Error | null>(null);
+
+  const [page, setPage] = useState(0);
+
+  const [openProfile, setOpenProfile] = useState(false);
+
+  const [profileFile, setProfileFile] = useState<File | null>(null);
+
+  const PAGE_SIZE = 6;
+
+  const [editableProfile, setEditableProfile] =
+    useState<User>(profileUser);
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const [open, setOpen] = useState(false);
+
+  const isOwnProfile = user.id === profileUser.id;
 
   useEffect(() => {
     setEditableProfile(profileUser);
   }, [profileUser]);
 
-  const totalPages = Math.ceil(highlights.length / PAGE_SIZE);
+  const totalPages = Math.max(
+    1,
+    Math.ceil(highlights.length / PAGE_SIZE),
+  );
+
+  const visibleFoods = useMemo(() => {
+    return highlights.slice(
+      page * PAGE_SIZE,
+      page * PAGE_SIZE + PAGE_SIZE,
+    );
+  }, [highlights, page]);
 
   const handleNext = () => {
-    setPage((prev) => (prev + 1) % totalPages); // loop
+    setPage((prev) => (prev + 1) % totalPages);
   };
 
   const handlePrev = () => {
-    setPage((prev) => (prev - 1 + totalPages) % totalPages); // loop backwards
+    setPage((prev) => (prev - 1 + totalPages) % totalPages);
   };
-
-  const visibleFoods = useMemo(() => {
-    return highlights.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
-  }, [highlights, page]);
 
   const handleClose = () => {
     setOpenMetaDialog(false);
@@ -118,18 +133,21 @@ export default function ProfileHeader({
     if (!file) return;
 
     const formData = new FormData();
-    formData.append("file", file); // 👈 must match parameter name in FastAPI
+
+    formData.append("file", file);
 
     try {
-      const res = await fetch("http://localhost:8000/food/upload", {
-        method: "POST",
-        credentials: "include", // 👈 important if using auth cookies
-        body: formData,
-      });
+      const res = await fetch(
+        "http://localhost:8000/food/upload",
+        {
+          method: "POST",
+          credentials: "include",
+          body: formData,
+        },
+      );
 
       if (!res.ok) {
-        const err = await res.text();
-        throw new Error(err);
+        throw new Error(await res.text());
       }
 
       return res.json();
@@ -149,18 +167,20 @@ export default function ProfileHeader({
     };
 
     try {
-      const res = await fetch("http://localhost:8000/foods", {
-        method: "POST",
-        credentials: "include", // 👈 important if using auth cookies
-        headers: {
-          "Content-Type": "application/json",
+      const res = await fetch(
+        "http://localhost:8000/foods",
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(foodieMetaData),
         },
-        body: JSON.stringify(foodieMetaData),
-      });
+      );
 
       if (!res.ok) {
-        const err = await res.text();
-        throw new Error(err);
+        throw new Error(await res.text());
       }
 
       return res.json();
@@ -172,29 +192,33 @@ export default function ProfileHeader({
   const updateUserProfile = async () => {
     const formData = new FormData();
 
-    if (editableProfile && user) {
-      if (editableProfile.bio !== user.bio) {
-        formData.append("bio", editableProfile.bio ?? "");
-      }
-
-      if (editableProfile.phone_number !== user.phone_number) {
-        formData.append("phone_number", editableProfile.phone_number ?? "");
-      }
+    if (editableProfile.bio !== user.bio) {
+      formData.append("bio", editableProfile.bio ?? "");
     }
-    // Only append changed fields
+
+    if (
+      editableProfile.phone_number !== user.phone_number
+    ) {
+      formData.append(
+        "phone_number",
+        editableProfile.phone_number ?? "",
+      );
+    }
 
     if (profileFile) {
       formData.append("file", profileFile);
     }
 
-    // Nothing changed → exit early
     if ([...formData.entries()].length === 0) return;
 
-    const res = await fetch("http://localhost:8000/users/profile", {
-      method: "PATCH",
-      credentials: "include",
-      body: formData,
-    });
+    const res = await fetch(
+      "http://localhost:8000/users/profile",
+      {
+        method: "PATCH",
+        credentials: "include",
+        body: formData,
+      },
+    );
 
     if (!res.ok) {
       throw new Error(await res.text());
@@ -203,33 +227,50 @@ export default function ProfileHeader({
     return res.json();
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (
+    e: React.FormEvent,
+  ) => {
     e.preventDefault();
 
     if (!selectedFile) return;
-    const uploaded = await uploadImage(selectedFile);
-    const uploadFood = await uploadImageMetaData(uploaded.key);
 
-    console.log("uploadFood", uploadFood);
+    try {
+      const uploaded = await uploadImage(selectedFile);
 
-    setFoodList((prev) => [uploadFood, ...prev]);
+      if (!uploaded) return;
 
-    setName("");
-    setDescription("");
-    setType("");
-    setGrade(0);
-    setLocation("");
+      const uploadFood = await uploadImageMetaData(
+        uploaded.key,
+      );
 
-    setOpenMetaDialog(false);
+      if (!uploadFood) return;
+
+      setFoodList((prev) => [
+        uploadFood,
+        ...prev,
+      ]);
+
+      setName("");
+      setDescription("");
+      setType("");
+      setGrade(0);
+      setLocation("");
+
+      setOpenMetaDialog(false);
+    } catch (err) {
+      setError(err as Error);
+    }
   };
 
   const handleProfileClose = () => {
-  setEditableProfile(profileUser);
-  setProfileFile(null);
-  setOpenProfile(false);
+    setEditableProfile(profileUser);
+    setProfileFile(null);
+    setOpenProfile(false);
   };
 
-  const handleUserProfileSubmit = async (e: React.FormEvent) => {
+  const handleUserProfileSubmit = async (
+    e: React.FormEvent,
+  ) => {
     e.preventDefault();
 
     try {
@@ -238,17 +279,22 @@ export default function ProfileHeader({
       if (!updatedUser) return;
 
       setEditableProfile(updatedUser);
+
       setUser(updatedUser);
 
       setProfileFile(null);
+
       setOpenProfile(false);
     } catch (error) {
       setError(error as Error);
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = e.target.files?.[0];
+
     if (!file) return;
 
     setProfileFile(file);
@@ -256,7 +302,9 @@ export default function ProfileHeader({
     setOpenProfile(true);
   };
 
-  const handleHighlightDelete = async (foodItem: FoodItem) => {
+  const handleHighlightDelete = async (
+    foodItem: FoodItem,
+  ) => {
     try {
       const req = await fetch(
         `http://localhost:8000/profile/highlights/${foodItem.id}`,
@@ -270,16 +318,21 @@ export default function ProfileHeader({
 
       const data = await req.json();
 
-      setHighlights((prev) => prev.filter((food) => food.id !== data.food_id));
+      setHighlights((prev) =>
+        prev.filter(
+          (food) => food.id !== data.food_id,
+        ),
+      );
 
       setOpen(false);
     } catch (err) {
-      // setError(err as Error);
       console.log("error", err);
     }
   };
 
-  const handleHighlightedItem = (index: number) => {
+  const handleHighlightedItem = (
+    index: number,
+  ) => {
     setCurrentIndex(index);
     setOpen(true);
   };
@@ -287,18 +340,17 @@ export default function ProfileHeader({
   if (error) {
     return (
       <Box sx={{ p: 2 }}>
-        <Alert severity="error">{error.message}</Alert>
+        <Alert severity="error">
+          {error.message}
+        </Alert>
       </Box>
     );
   }
-
-  // console.log("user", user);
 
   return (
     <>
       <Grid
         size={{ xs: 6 }}
-        // sx={{ marginTop: "25px", border: "3px solid red", maxWidth: "100%" }}
         sx={{
           width: "100%",
           overflow: "hidden",
@@ -315,232 +367,414 @@ export default function ProfileHeader({
             justifyContent: "center",
             alignItems: "center",
             width: "100%",
-            mt: { xs: 2, md: 4 }, // responsive spacing
+            mt: { xs: 2, md: 4 },
           }}
         >
           <Stack
             direction="row"
             spacing={3}
-            alignItems="center" // 👈 vertically align avatar + text
+            alignItems="center"
           >
             <Avatar
               id="profile_img"
               src={profileUser.url ?? ""}
               sx={{
-                width: { xs: 48, sm: 56, md: 64, lg: 80 },
-                height: { xs: 48, sm: 56, md: 64, lg: 80 }, // fix typo (47 → 48)
+                width: {
+                  xs: 48,
+                  sm: 56,
+                  md: 64,
+                  lg: 80,
+                },
+                height: {
+                  xs: 48,
+                  sm: 56,
+                  md: 64,
+                  lg: 80,
+                },
               }}
             />
 
             <Box>
-              <Typography>{profileUser.user_name}</Typography>
-              <Typography>{profileUser.full_name}</Typography>
+              <Typography>
+                {profileUser.user_name}
+              </Typography>
 
-              <Stack direction="row" spacing={2}>
+              <Typography>
+                {profileUser.full_name}
+              </Typography>
+
+              <Stack
+                direction="row"
+                spacing={2}
+              >
                 <Stack alignItems="center">
-                  <Typography>{foodList.length}</Typography>
-                  <Typography>Posts</Typography>
+                  <Typography>
+                    {foodList.length}
+                  </Typography>
+
+                  <Typography>
+                    Posts
+                  </Typography>
                 </Stack>
 
                 <Stack alignItems="center">
-                  <Typography>{followers.length}</Typography>
-                  <Typography>Followers</Typography>
+                  <Typography>
+                    {followers.length}
+                  </Typography>
+
+                  <Typography>
+                    Followers
+                  </Typography>
                 </Stack>
 
                 <Stack alignItems="center">
-                  <Typography>{following.length}</Typography>
-                  <Typography>Following</Typography>
+                  <Typography>
+                    {following.length}
+                  </Typography>
+
+                  <Typography>
+                    Following
+                  </Typography>
                 </Stack>
               </Stack>
             </Box>
           </Stack>
 
           {isOwnProfile ? (
-            <Button onClick={() => setOpenProfile(true)}>Edit Profile</Button>
+            <Button
+              onClick={() =>
+                setOpenProfile(true)
+              }
+            >
+              Edit Profile
+            </Button>
           ) : (
             <Button>Follow</Button>
           )}
 
-          <Box display="flex" alignItems="center" gap={1} sx={{ mt: 2 }}>
-            <IconButton sx={{ color: "white" }} onClick={handlePrev}>
+          <Box
+            display="flex"
+            alignItems="center"
+            gap={1}
+            sx={{ mt: 2 }}
+          >
+            <IconButton
+              sx={{ color: "white" }}
+              onClick={handlePrev}
+            >
               ←
             </IconButton>
 
             <Box display="flex" gap={1}>
-              {visibleFoods.map((food, index) => (
-                <Avatar
-                  key={food.id}
-                  src={food.url}
-                  onClick={() => handleHighlightedItem(index)}
-                  sx={{
-                    width: { xs: 40, sm: 48, md: 56 },
-                    height: { xs: 40, sm: 48, md: 56 },
-                    cursor: "pointer",
-                  }}
-                />
-              ))}
+              {visibleFoods.map(
+                (food, index) => (
+                  <Avatar
+                    key={food.id}
+                    src={food.url}
+                    onClick={() =>
+                      handleHighlightedItem(
+                        page * PAGE_SIZE +
+                          index,
+                      )
+                    }
+                    sx={{
+                      width: {
+                        xs: 40,
+                        sm: 48,
+                        md: 56,
+                      },
+                      height: {
+                        xs: 40,
+                        sm: 48,
+                        md: 56,
+                      },
+                      cursor: "pointer",
+                    }}
+                  />
+                ),
+              )}
             </Box>
 
-            <IconButton sx={{ color: "white" }} onClick={handleNext}>
+            <IconButton
+              sx={{ color: "white" }}
+              onClick={handleNext}
+            >
               →
             </IconButton>
           </Box>
         </Box>
       </Grid>
-      {/* <Grid size={12}>
-        <input
-          type="file"
-          accept="image/*"
-          hidden
-          onChange={handleChange}
-          ref={fileInputRef}
-        />
-      </Grid> */}
-      <Grid size={12} sx={{ display: "flex", justifyContent: "center" }}>
+
+      <Grid
+        size={12}
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
         <Stack
           direction="row"
           spacing={{
-            xs: 4, // mobile
+            xs: 4,
             sm: 6,
             md: 8,
             lg: 10,
           }}
         >
-          <Link href={`/profile/${editableProfile.user_name}/`}>
+          <Link
+            href={`/profile/${editableProfile.user_name}/`}
+          >
             <AppsIcon
-              sx={{ height: "4em", display: "flex", cursor: "pointer" }}
+              sx={{
+                height: "4em",
+                display: "flex",
+                cursor: "pointer",
+              }}
             />
           </Link>
-          <Link href={`/profile/${editableProfile.user_name}/favorites`}>
-            <BookmarkIcon sx={{ height: "4em", cursor: "pointer" }} />
+
+          <Link
+            href={`/profile/${editableProfile.user_name}/favorites`}
+          >
+            <BookmarkIcon
+              sx={{
+                height: "4em",
+                cursor: "pointer",
+              }}
+            />
           </Link>
-          <Link href={`/profile/${editableProfile.user_name}/newItem`}>
-            <ChecklistIcon sx={{ height: "4em", cursor: "pointer" }} />
+
+          <Link
+            href={`/profile/${editableProfile.user_name}/newItem`}
+          >
+            <ChecklistIcon
+              sx={{
+                height: "4em",
+                cursor: "pointer",
+              }}
+            />
           </Link>
-          <Link href={`/profile/${editableProfile.user_name}/topTen`}>
-            <Timer10SelectIcon sx={{ height: "4em", cursor: "pointer" }} />
+
+          <Link
+            href={`/profile/${editableProfile.user_name}/topTen`}
+          >
+            <Timer10SelectIcon
+              sx={{
+                height: "4em",
+                cursor: "pointer",
+              }}
+            />
           </Link>
-          <Link href={`/profile/${editableProfile.user_name}/search`}>
-            <SearchIcon sx={{ height: "4em", cursor: "pointer" }} />
+
+          <Link
+            href={`/profile/${editableProfile.user_name}/search`}
+          >
+            <SearchIcon
+              sx={{
+                height: "4em",
+                cursor: "pointer",
+              }}
+            />
           </Link>
         </Stack>
       </Grid>
-      <Dialog open={openMetaDialog} onClose={handleClose}>
-        <DialogTitle>Foodie Item</DialogTitle>
+
+      <Dialog
+        open={openMetaDialog}
+        onClose={handleClose}
+      >
+        <DialogTitle>
+          Foodie Item
+        </DialogTitle>
+
         <DialogContent>
           <DialogContentText>
-            Enter some basic information to remember about this experience
+            Enter some basic information to
+            remember about this experience
           </DialogContentText>
         </DialogContent>
+
         <form onSubmit={handleSubmit}>
           <Stack sx={{ m: 2 }} spacing={2}>
             <TextField
-              id="outlined-controlled"
               label="Restaurant Name"
               value={name}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                setName(event.target.value);
-              }}
+              onChange={(event) =>
+                setName(event.target.value)
+              }
             />
+
             <TextField
-              id="outlined-controlled"
               label="Menu Item Description"
               value={description}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                setDescription(event.target.value);
-              }}
+              onChange={(event) =>
+                setDescription(
+                  event.target.value,
+                )
+              }
             />
+
             <TextField
-              id="outlined-controlled"
               label="Type"
               value={type}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                setType(event.target.value);
-              }}
+              onChange={(event) =>
+                setType(event.target.value)
+              }
             />
+
             <TextField
-              id="outlined-controlled"
               label="Overall Grade"
               type="number"
               value={grade}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                setGrade(parseInt(event.target.value));
-              }}
+              onChange={(event) =>
+                setGrade(
+                  parseInt(
+                    event.target.value,
+                  ),
+                )
+              }
               slotProps={{
-                htmlInput: { min: 0, max: 5 },
+                htmlInput: {
+                  min: 0,
+                  max: 5,
+                },
               }}
             />
+
             <TextField
-              id="outlined-controlled"
               label="Location"
               value={location}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                setLocation(event.target.value);
-              }}
+              onChange={(event) =>
+                setLocation(
+                  event.target.value,
+                )
+              }
             />
           </Stack>
+
           <DialogActions>
-            <Button type="submit">Submit</Button>
-            <Button onClick={handleClose}>Cancel</Button>
+            <Button type="submit">
+              Submit
+            </Button>
+
+            <Button onClick={handleClose}>
+              Cancel
+            </Button>
           </DialogActions>
         </form>
       </Dialog>
-      <Dialog open={openProfile} onClose={handleProfileClose}>
-        <DialogTitle>Edit Profile</DialogTitle>
+
+      <Dialog
+        open={openProfile}
+        onClose={handleProfileClose}
+      >
+        <DialogTitle>
+          Edit Profile
+        </DialogTitle>
+
         <DialogContent>
-          <form onSubmit={(event) => handleUserProfileSubmit(event)}>
-            <Stack direction="row" sx={{ m: 2 }} spacing={2}>
+          <form
+            onSubmit={
+              handleUserProfileSubmit
+            }
+          >
+            <Stack
+              direction="row"
+              sx={{ m: 2 }}
+              spacing={2}
+            >
               <Avatar
                 id="profile_img"
-                src={editableProfile.url ?? ""}
+                src={
+                  editableProfile.url ?? ""
+                }
                 sx={{
-                  width: { xs: 48, sm: 56, md: 64, lg: 80 },
-                  height: { xs: 48, sm: 56, md: 64, lg: 80 },
+                  width: {
+                    xs: 48,
+                    sm: 56,
+                    md: 64,
+                    lg: 80,
+                  },
+                  height: {
+                    xs: 48,
+                    sm: 56,
+                    md: 64,
+                    lg: 80,
+                  },
                 }}
               />
-              <Button variant="contained" component="label">
+
+              <Button
+                variant="contained"
+                component="label"
+              >
                 Upload Image
+
                 <input
                   type="file"
                   hidden
                   accept="image/*"
-                  onChange={handleFileChange}
+                  onChange={
+                    handleFileChange
+                  }
                 />
               </Button>
             </Stack>
+
             <Stack spacing={2}>
               <TextField
                 multiline
-                value={editableProfile.bio ?? ""}
+                value={
+                  editableProfile.bio ??
+                  ""
+                }
                 onChange={(event) =>
-                  setEditableProfile((prev) => ({
-                    ...prev,
-                    bio: event.target.value,
-                  }))
+                  setEditableProfile(
+                    (prev) => ({
+                      ...prev,
+                      bio: event.target.value,
+                    }),
+                  )
                 }
                 sx={{ m: 2 }}
                 placeholder="Update Bio"
               />
+
               <TextField
-                onChange={(event) =>
-                  setEditableProfile((prev) => ({
-                    ...prev,
-                    phone_number: event.target.value,
-                  }))
+                value={
+                  editableProfile.phone_number
                 }
-                value={editableProfile.phone_number}
+                onChange={(event) =>
+                  setEditableProfile(
+                    (prev) => ({
+                      ...prev,
+                      phone_number:
+                        event.target.value,
+                    }),
+                  )
+                }
                 sx={{ m: 2 }}
                 placeholder="Phone Number"
               />
             </Stack>
 
             <DialogActions>
-              <Button type="submit">Submit</Button>
-              <Button onClick={handleProfileClose}>Cancel</Button>
+              <Button type="submit">
+                Submit
+              </Button>
+
+              <Button
+                onClick={
+                  handleProfileClose
+                }
+              >
+                Cancel
+              </Button>
             </DialogActions>
           </form>
         </DialogContent>
       </Dialog>
+
       <ProfileFoodDialog
         foodList={highlights}
         currentIndex={currentIndex}

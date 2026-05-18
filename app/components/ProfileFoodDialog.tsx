@@ -17,32 +17,23 @@ import {
   Rating,
   Divider,
 } from "@mui/material";
+
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
+
 import DeleteIcon from "@mui/icons-material/Delete";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import CloseIcon from "@mui/icons-material/Close";
 import ModeCommentIcon from "@mui/icons-material/ModeComment";
+
 import Image from "next/image";
 import { useSwipeable } from "react-swipeable";
-import { useUI } from "../providers/providers";
 import { useUser } from "../providers/MainProvider";
-import { useState, useEffect, useRef } from "react";
 
-interface FoodItem {
-  description: string;
-  grade: number;
-  id: number;
-  image_key: string;
-  url: string;
-  location: string;
-  name: string;
-  type: string;
-  user_id: number;
-  created_at: string;
-}
+import { useState, useEffect, useRef } from "react";
+import { FoodItem } from "../schemas/schemas";
 
 interface ProfileDialogProps {
   foodList: FoodItem[];
@@ -50,7 +41,9 @@ interface ProfileDialogProps {
   setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  onDelete: (food: FoodItem) => Promise<void>;
+  onDelete?: (food: FoodItem) => Promise<void>;
+  onLikeToggle?: (foodId: number, liked: boolean) => void;
+  onBookmarkToggle?: (foodId: number, bookmarked: boolean) => void;
 }
 
 interface Comment {
@@ -59,25 +52,16 @@ interface Comment {
   user_id: number;
   text: string;
   created_at: string;
+
   user: {
+    id: number;
     url: string;
     user_name: string;
-    id: number;
   };
-}
-
-interface Likes {
-  food_id: number;
 }
 
 interface FoodInteractions {
   comments?: Comment[];
-  liked?: boolean;
-  bookmarked?: boolean;
-}
-
-interface Favorites {
-  food_id: number;
 }
 
 export default function ProfileFoodDialog({
@@ -87,23 +71,27 @@ export default function ProfileFoodDialog({
   open,
   setOpen,
   onDelete,
+  onLikeToggle,
+  onBookmarkToggle,
 }: ProfileDialogProps) {
   const theme = useTheme();
+
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+  const { user } = useUser();
+
   const [error, setError] = useState<Error | null>(null);
 
-  const [foodCache, setFoodCache] = useState<Record<number, FoodInteractions>>(
-    {},
-  );
-  const [focused, setFocused] = useState(false);
-  const [commentText, setCommentText] = useState("");
-  const hasLoadedBookmarks = useRef(false);
+  const [foodCache, setFoodCache] = useState<
+    Record<number, FoodInteractions>
+  >({});
 
-  /* ---------------------------
-     SAFE DERIVED VALUES
-  --------------------------- */
+  const [focused, setFocused] = useState(false);
+
+  const [commentText, setCommentText] = useState("");
+
+  const hasLoadedComments = useRef(false);
 
   const foodItem = foodList[currentIndex];
 
@@ -115,49 +103,6 @@ export default function ProfileFoodDialog({
   const foodData = foodItem ? (foodCache[foodItem.id] ?? {}) : {};
 
   const comments = foodData.comments ?? [];
-  const isLiked = foodData.liked ?? false;
-  const isBookmarked = foodData.bookmarked ?? false;
-  const { setFoodList } = useUI();
-  const { user } = useUser()
-
-  /* ---------------------------
-     LOAD LIKES
-  --------------------------- */
-
-  useEffect(() => {
-    if (!foodList.length) return;
-
-    const loadLikes = async () => {
-      try {
-        const res = await fetch(`http://localhost:8000/foods/likes/${user.user_name}`, {
-          credentials: "include",
-        });
-
-        if (!res.ok) throw new Error("Failed to fetch likes");
-
-        const data = await res.json();
-
-        const likedSet = new Set(data.map((item: Likes) => item.food_id));
-
-        setFoodCache((prev) => {
-          const updated = { ...prev };
-
-          foodList.forEach((food) => {
-            updated[food.id] = {
-              ...updated[food.id],
-              liked: likedSet.has(food.id),
-            };
-          });
-
-          return updated;
-        });
-      } catch (err) {
-        setError(err as Error);
-      }
-    };
-
-    loadLikes();
-  }, [foodList]);
 
   /* ---------------------------
      LOAD COMMENTS
@@ -165,6 +110,7 @@ export default function ProfileFoodDialog({
 
   useEffect(() => {
     if (!open) return;
+
     if (!foodItem) return;
 
     const loadComments = async () => {
@@ -173,10 +119,14 @@ export default function ProfileFoodDialog({
       try {
         const res = await fetch(
           `http://localhost:8000/foods/${foodItem.id}/comments`,
-          { credentials: "include" },
+          {
+            credentials: "include",
+          },
         );
 
-        if (!res.ok) throw new Error("Failed to fetch comments");
+        if (!res.ok) {
+          throw new Error("Failed to fetch comments");
+        }
 
         const data = await res.json();
 
@@ -201,14 +151,18 @@ export default function ProfileFoodDialog({
 
   useEffect(() => {
     if (!open) return;
+
     if (!nextFood) return;
+
     if (foodCache[nextFood.id]?.comments) return;
 
     const prefetchNext = async () => {
       try {
         const res = await fetch(
           `http://localhost:8000/foods/${nextFood.id}/comments`,
-          { credentials: "include" },
+          {
+            credentials: "include",
+          },
         );
 
         if (!res.ok) return;
@@ -229,53 +183,6 @@ export default function ProfileFoodDialog({
   }, [nextFood, open]);
 
   /* ---------------------------
-     BOOKMARKED ITEMS
-  --------------------------- */
-
-  useEffect(() => {
-    if (!foodList.length) return;
-
-    const loadBookMarks = async () => {
-      if (!foodList.length || hasLoadedBookmarks.current) return;
-
-      try {
-        const res = await fetch(
-          `http://localhost:8000/profile/foods/favorites/${user.user_name}`,
-          {
-            credentials: "include",
-          },
-        );
-
-        if (!res.ok) throw new Error("Failed to fetch BookMarks");
-
-        const data = await res.json();
-        const bookmarkedSet = new Set(
-          data.map((item: Favorites) => item.food_id),
-        );
-
-        setFoodCache((prev) => {
-          const updated = { ...prev };
-
-          foodList.forEach((food) => {
-            updated[food.id] = {
-              ...(updated[food.id] ?? {}),
-              bookmarked: bookmarkedSet.has(food.id),
-            };
-          });
-
-          return updated;
-        });
-
-        hasLoadedBookmarks.current = true;
-      } catch (error) {
-        setError(error as Error);
-      }
-    };
-
-    loadBookMarks();
-  }, [foodList]);
-
-  /* ---------------------------
      NAVIGATION
   --------------------------- */
 
@@ -284,11 +191,12 @@ export default function ProfileFoodDialog({
   };
 
   const handlePrev = () => {
-    setCurrentIndex((prev) => (prev === 0 ? foodList.length - 1 : prev - 1));
+    setCurrentIndex((prev) =>
+      prev === 0 ? foodList.length - 1 : prev - 1,
+    );
   };
 
   const handleClose = () => {
-    console.log("handle close clicked");
     setOpen(false);
   };
 
@@ -298,12 +206,14 @@ export default function ProfileFoodDialog({
     trackMouse: true,
   });
 
+  /* ---------------------------
+     COMMENTS
+  --------------------------- */
+
   const handleCommentAdded = async () => {
     if (!foodItem) return;
 
-    const comment = {
-      text: commentText,
-    };
+    if (!commentText.trim()) return;
 
     try {
       const req = await fetch(
@@ -311,12 +221,18 @@ export default function ProfileFoodDialog({
         {
           method: "POST",
           credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(comment),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            text: commentText,
+          }),
         },
       );
 
-      if (!req.ok) return;
+      if (!req.ok) {
+        throw new Error("Failed to create comment");
+      }
 
       const data = await req.json();
 
@@ -347,42 +263,45 @@ export default function ProfileFoodDialog({
         {
           method: "POST",
           credentials: "include",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
       );
 
       if (!res.ok) return;
 
-      setFoodCache((prev) => ({
-        ...prev,
-        [foodItem.id]: {
-          ...prev[foodItem.id],
-          liked: !prev[foodItem.id]?.liked,
-        },
-      }));
+      const data = await res.json();
+
+      const liked = data.status === "liked";
+
+      onLikeToggle?.(foodItem.id, liked);
     } catch (err) {
       setError(err as Error);
     }
   };
 
+  /* ---------------------------
+     BOOKMARK
+  --------------------------- */
+
   const handleBookmarkedItem = async () => {
+    if (!foodItem) return;
+
     try {
-      const req = await fetch(`http://localhost:8000/foods/${foodItem.id}/favorites/${user.user_name}`, {
-        method: "POST",
-        credentials: "include",
-      });
+      const req = await fetch(
+        `http://localhost:8000/foods/${foodItem.id}/favorites/${user.user_name}`,
+        {
+          method: "POST",
+          credentials: "include",
+        },
+      );
 
       if (!req.ok) return;
 
       const data = await req.json();
 
-      setFoodCache((prev) => ({
-        ...prev,
-        [foodItem.id]: {
-          ...(prev[foodItem.id] ?? {}),
-          bookmarked: data.favorited,
-        },
-      }));
+      onBookmarkToggle?.(foodItem.id, data.favorited);
     } catch (err) {
       setError(err as Error);
     }
@@ -392,7 +311,9 @@ export default function ProfileFoodDialog({
      RENDER GUARDS
   --------------------------- */
 
-  if (!foodList.length || currentIndex >= foodList.length) return null;
+  if (!foodList.length || currentIndex >= foodList.length) {
+    return null;
+  }
 
   if (error) {
     return (
@@ -405,7 +326,6 @@ export default function ProfileFoodDialog({
   /* ---------------------------
      UI
   --------------------------- */
-  console.log("open", open);
 
   return (
     <Dialog
@@ -423,7 +343,7 @@ export default function ProfileFoodDialog({
           right: 8,
           top: 8,
           color: theme.palette.grey[500],
-          zIndex: 9999, // 👈 add this
+          zIndex: 9999,
         })}
       >
         <CloseIcon />
@@ -438,6 +358,7 @@ export default function ProfileFoodDialog({
         }}
       >
         {/* IMAGE */}
+
         <Box
           {...handlers}
           sx={{
@@ -446,19 +367,18 @@ export default function ProfileFoodDialog({
             position: "relative",
           }}
         >
-          {foodItem && (
-            <Image
-              src={foodItem.url}
-              alt={foodItem.name}
-              fill
-              priority
-              style={{ objectFit: "cover" }}
-              sizes="(max-width: 900px) 100vw, 50vw"
-            />
-          )}
+          <Image
+            src={foodItem.url}
+            alt={foodItem.name}
+            fill
+            priority
+            style={{ objectFit: "cover" }}
+            sizes="(max-width: 900px) 100vw, 50vw"
+          />
         </Box>
 
         {/* RIGHT SIDE */}
+
         <Box
           sx={{
             width: { xs: "100%", md: "50%" },
@@ -466,11 +386,12 @@ export default function ProfileFoodDialog({
             flexDirection: "column",
           }}
         >
+          {/* USER */}
+
           <Box>
             <ListItem>
               <ListItemAvatar>
                 <Avatar
-                  id="profile_img"
                   src={user.url ?? ""}
                   sx={{
                     width: { xs: 28, sm: 30, md: 42, lg: 48 },
@@ -478,26 +399,40 @@ export default function ProfileFoodDialog({
                   }}
                 />
               </ListItemAvatar>
-              <ListItemText
-                sx={{ display: "flex", flexWrap: "wrap" }}
-                primary={user.user_name}
-              />
+
+              <ListItemText primary={user.user_name} />
             </ListItem>
+
             <Divider />
           </Box>
-          {/* <Box sx={{ pt: 2, pl: 2, pb: 1 }}>
-            <DialogContentText>{foodItem?.description}</DialogContentText>
-          </Box>
-          <Box sx={{ pl: 2 }}>
-            <Rating name="read-only" value={foodItem?.grade} readOnly />
-          </Box> */}
-          <Stack sx={{ pt: 2, pl: 2 }} direction="column" spacing={1}>
-            <DialogContentText>{foodItem?.name}</DialogContentText>
-            <DialogContentText>{foodItem?.description}</DialogContentText>
-            <DialogContentText>{foodItem?.location}</DialogContentText>
-            {/* <DialogContentText>{foodItem?.type}</DialogContentText> */}
-            <Rating name="read-only" value={foodItem?.grade} readOnly />
+
+          {/* FOOD INFO */}
+
+          <Stack
+            sx={{ pt: 2, pl: 2 }}
+            direction="column"
+            spacing={1}
+          >
+            <DialogContentText>
+              {foodItem.name}
+            </DialogContentText>
+
+            <DialogContentText>
+              {foodItem.description}
+            </DialogContentText>
+
+            <DialogContentText>
+              {foodItem.location}
+            </DialogContentText>
+
+            <Rating
+              name="read-only"
+              value={foodItem.grade}
+              readOnly
+            />
           </Stack>
+
+          {/* COMMENTS */}
 
           {!isMobile && (
             <List
@@ -511,7 +446,6 @@ export default function ProfileFoodDialog({
                 <ListItem key={comment.id}>
                   <ListItemAvatar>
                     <Avatar
-                      id="profile_img"
                       src={comment.user.url ?? ""}
                       sx={{
                         width: { xs: 28, sm: 30, md: 42, lg: 48 },
@@ -519,51 +453,80 @@ export default function ProfileFoodDialog({
                       }}
                     />
                   </ListItemAvatar>
+
                   <ListItemText
                     primary={comment.user.user_name}
                     secondary={comment.text}
                     slotProps={{
                       primary: {
-                        sx: { mb: 0.5 },
+                        sx: {
+                          mb: 0.5,
+                        },
                       },
                     }}
                   />
-                  {/* <ListItemText
-                    sx={{ display: "flex", flexWrap: "wrap" }}
-                    primary={comment.text}
-                  /> */}
                 </ListItem>
               ))}
             </List>
           )}
 
+          {/* ACTIONS */}
+
           <Box sx={{ p: 1 }}>
             <Stack direction="row" spacing={0.5}>
               <IconButton onClick={handleUserLike}>
-                <FavoriteIcon color={isLiked ? "error" : "inherit"} />
+                <FavoriteIcon
+                  color={
+                    foodItem.liked_by_user
+                      ? "error"
+                      : "inherit"
+                  }
+                />
               </IconButton>
+
+              <DialogContentText>
+                {foodItem.like_count}
+              </DialogContentText>
 
               <IconButton onClick={() => setFocused(true)}>
                 <ModeCommentIcon />
               </IconButton>
 
+              <DialogContentText>
+                {foodItem.comment_count}
+              </DialogContentText>
+
               <IconButton onClick={handleBookmarkedItem}>
-                <BookmarkIcon color={isBookmarked ? "warning" : "inherit"} />
+                <BookmarkIcon
+                  color={
+                    foodItem.bookmarked_by_user
+                      ? "warning"
+                      : "inherit"
+                  }
+                />
               </IconButton>
 
-              {foodItem.user_id === user.id && (
+              {foodItem.user_id === user.id && onDelete && (
                 <IconButton onClick={() => onDelete(foodItem)}>
-                  <DeleteIcon  />
+                  <DeleteIcon />
                 </IconButton>
               )}
 
               {!isMobile && (
                 <>
-                  <IconButton onClick={handlePrev}>←</IconButton>
-                  <IconButton onClick={handleNext}>→</IconButton>
+                  <IconButton onClick={handlePrev}>
+                    ←
+                  </IconButton>
+
+                  <IconButton onClick={handleNext}>
+                    →
+                  </IconButton>
                 </>
               )}
             </Stack>
+
+            {/* COMMENT INPUT */}
+
             <Stack direction="row">
               <TextField
                 fullWidth
@@ -571,8 +534,11 @@ export default function ProfileFoodDialog({
                 sx={{ mt: 1 }}
                 focused={focused}
                 value={commentText}
-                onChange={(event) => setCommentText(event.target.value)}
+                onChange={(event) =>
+                  setCommentText(event.target.value)
+                }
               />
+
               <Button
                 onClick={handleCommentAdded}
                 disabled={commentText.length === 0}
